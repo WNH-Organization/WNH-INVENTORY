@@ -1,0 +1,13 @@
+# Hugo generated cache & thumbnails
+resources/_gen/
+assets/jsconfig.json
+.hugo_build.lock
+
+# The compiled website (if you build locally)
+public/
+
+# Mac OS junk (just in case)
+.DS_Store
+
+# Neovim swap files
+*.swp

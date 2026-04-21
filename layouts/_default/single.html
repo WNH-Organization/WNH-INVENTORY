@@ -9,7 +9,7 @@
         :root { 
             --pico-font-family: 'Fira Code', monospace; 
             --pico-primary: #4ade80; 
-            --pico-spacing: 0.5rem; /* Forces Pico to stop using huge margins */
+            --pico-spacing: 0.5rem; 
             --pico-typography-spacing-vertical: 0.5rem;
         }
         body { font-size: 14px; line-height: 1.4; background: #0d1117; }
@@ -33,7 +33,7 @@
         
         /* 5. Smaller, Tighter Photos */
         .photo-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-        .photo-grid img { height: 120px; width: auto; max-width: 200px; object-fit: cover; border: 1px solid #30363d; border-radius: 4px; opacity: 0.8; transition: opacity 0.2s; }
+        .photo-grid img { height: 120px; width: auto; max-width: 200px; object-fit: cover; border: 1px solid #30363d; border-radius: 4px; opacity: 0.8; transition: opacity 0.2s; cursor: zoom-in; }
         .photo-grid img:hover { opacity: 1; }
         
         nav { font-size: 0.9rem; margin-top: 1rem; }
@@ -63,7 +63,9 @@
                 <div class="photo-grid">
                     {{ range $initial }}
                         {{ $opt := .Fit "400x300 q85" }}
-                        <a href="{{ .RelPermalink }}"><img src="{{ $opt.RelPermalink }}"></a>
+                        <img src="{{ $opt.RelPermalink }}" 
+                             onclick="openLightbox('{{ .RelPermalink }}')" 
+                             alt="Initial Hardware State">
                     {{ end }}
                 </div>
             </section>
@@ -89,7 +91,9 @@
                 <div class="photo-grid">
                     {{ range $current }}
                         {{ $opt := .Fit "400x300 q85" }}
-                        <a href="{{ .RelPermalink }}"><img src="{{ $opt.RelPermalink }}"></a>
+                        <img src="{{ $opt.RelPermalink }}" 
+                             onclick="openLightbox('{{ .RelPermalink }}')" 
+                             alt="Current Hardware State">
                     {{ end }}
                 </div>
             </section>
@@ -104,6 +108,34 @@
             </section>
             {{ end }}
         </div>
+
+        <dialog id="lightbox">
+            <article style="background: transparent; border: none; box-shadow: none; max-width: 95vw; display: flex; flex-direction: column; align-items: center;">
+                <a href="#close" aria-label="Close" class="close" onclick="closeLightbox(event)" style="align-self: flex-end; margin-bottom: 1rem;"></a>
+                <img id="lightbox-img" src="" style="max-height: 80vh; border-radius: 8px; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: zoom-out;" onclick="closeLightbox(event)">
+            </article>
+        </dialog>
     </main>
+
+    <script>
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(highResUrl) {
+            lightboxImg.src = highResUrl;
+            lightbox.showModal();
+        }
+
+        function closeLightbox(event) {
+            event.preventDefault();
+            lightbox.close();
+        }
+
+        lightbox.addEventListener('click', function(event) {
+            if (event.target === lightbox) {
+                lightbox.close();
+            }
+        });
+    </script>
 </body>
 </html>

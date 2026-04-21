@@ -6,14 +6,35 @@
     <description>Recent content on My New Hugo Project</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 21 Apr 2026 17:51:28 +0100</lastBuildDate>
+    <lastBuildDate>Tue, 21 Apr 2026 17:59:41 +0100</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Wnh 001 Tl Mr3020</title>
+      <title>Wnh 004 Daewoo Dpc 7900pd</title>
+      <link>http://localhost:1313/hardware/wnh-004-daewoo-dpc-7900pd/</link>
+      <pubDate>Tue, 21 Apr 2026 17:59:41 +0100</pubDate>
+      <guid>http://localhost:1313/hardware/wnh-004-daewoo-dpc-7900pd/</guid>
+      <description>&lt;h2 id=&#34;technical-overview&#34;&gt;Technical Overview&lt;/h2&gt;&#xA;&lt;p&gt;[Provide a brief description of the hardware state and the intended project.]&lt;/p&gt;&#xA;&lt;h2 id=&#34;rescue-log&#34;&gt;Rescue Log&lt;/h2&gt;&#xA;&lt;p&gt;[Add detailed notes here&amp;hellip;]&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Wnh 003 Casio Pocket Tv 1400</title>
+      <link>http://localhost:1313/hardware/wnh-003-casio-pocket-tv-1400/</link>
+      <pubDate>Tue, 21 Apr 2026 17:59:12 +0100</pubDate>
+      <guid>http://localhost:1313/hardware/wnh-003-casio-pocket-tv-1400/</guid>
+      <description>&lt;h2 id=&#34;technical-overview&#34;&gt;Technical Overview&lt;/h2&gt;&#xA;&lt;p&gt;[Provide a brief description of the hardware state and the intended project.]&lt;/p&gt;&#xA;&lt;h2 id=&#34;rescue-log&#34;&gt;Rescue Log&lt;/h2&gt;&#xA;&lt;p&gt;[Add detailed notes here&amp;hellip;]&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Wnh 002 Honor X7</title>
+      <link>http://localhost:1313/hardware/wnh-002-honor-x7/</link>
+      <pubDate>Tue, 21 Apr 2026 17:58:17 +0100</pubDate>
+      <guid>http://localhost:1313/hardware/wnh-002-honor-x7/</guid>
+      <description>&lt;h2 id=&#34;technical-overview&#34;&gt;Technical Overview&lt;/h2&gt;&#xA;&lt;p&gt;[Provide a brief description of the hardware state and the intended project.]&lt;/p&gt;&#xA;&lt;h2 id=&#34;rescue-log&#34;&gt;Rescue Log&lt;/h2&gt;&#xA;&lt;p&gt;[Add detailed notes here&amp;hellip;]&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>TP-Link TL-MR3020</title>
       <link>http://localhost:1313/hardware/wnh-001-tl-mr3020/</link>
       <pubDate>Tue, 21 Apr 2026 17:51:28 +0100</pubDate>
       <guid>http://localhost:1313/hardware/wnh-001-tl-mr3020/</guid>
-      <description>&lt;h2 id=&#34;technical-overview&#34;&gt;Technical Overview&lt;/h2&gt;&#xA;&lt;p&gt;[Provide a brief description of the hardware state and the intended project.]&lt;/p&gt;&#xA;&lt;h2 id=&#34;rescue-log&#34;&gt;Rescue Log&lt;/h2&gt;&#xA;&lt;p&gt;[Add detailed notes here&amp;hellip;]&lt;/p&gt;</description>
+      <description>&lt;h2 id=&#34;technical-overview&#34;&gt;Technical Overview&lt;/h2&gt;&#xA;&lt;p&gt;Originally designed as a portable 3G/4G wireless travel router, this device has been entirely repurposed as the central orchestrator for a distributed, e-waste-built terminal known as &lt;strong&gt;The 3020 Project&lt;/strong&gt;.&lt;/p&gt;&#xA;&lt;p&gt;Running a highly customized OpenWrt Linux environment, the router acts as the system&amp;rsquo;s &amp;ldquo;core.&amp;rdquo; Instead of forcing the limited hardware to generate video or read sensors directly, it delegates tasks, routing I/O logic between specialized microcontrollers via TCP/IP and Serial connections.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

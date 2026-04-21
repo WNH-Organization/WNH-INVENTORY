@@ -2,14 +2,14 @@
 <html lang="en" data-theme="dark">
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
     <meta charset="utf-8">
-    <title>Wnh 001 Tl Mr3020 // WNH</title>
+    <title>TP-Link TL-MR3020 // WNH</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <style>
          
         :root { 
             --pico-font-family: 'Fira Code', monospace; 
             --pico-primary: #4ade80; 
-            --pico-spacing: 0.5rem;  
+            --pico-spacing: 0.5rem; 
             --pico-typography-spacing-vertical: 0.5rem;
         }
         body { font-size: 14px; line-height: 1.4; background: #0d1117; }
@@ -33,7 +33,7 @@
         
          
         .photo-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-        .photo-grid img { height: 120px; width: auto; max-width: 200px; object-fit: cover; border: 1px solid #30363d; border-radius: 4px; opacity: 0.8; transition: opacity 0.2s; }
+        .photo-grid img { height: 120px; width: auto; max-width: 200px; object-fit: cover; border: 1px solid #30363d; border-radius: 4px; opacity: 0.8; transition: opacity 0.2s; cursor: zoom-in; }
         .photo-grid img:hover { opacity: 1; }
         
         nav { font-size: 0.9rem; margin-top: 1rem; }
@@ -46,17 +46,34 @@
 
         <div class="terminal-box">
             <header>
-                <h1>Wnh 001 Tl Mr3020</h1>
+                <h1>TP-Link TL-MR3020</h1>
                 <div class="meta-row">
                     <span><strong>ID:</strong> <code>WNH-001</code></span>
-                    <span><strong>Status:</strong> <ins>unallocated</ins></span>
-                    <span><strong>Arch:</strong> TBD</span>
-                    <span><strong>Class:</strong> router</span>
-                    <span><strong>Donor:</strong> <a href="">Taha Ed-dafili</a></span>
+                    <span><strong>Status:</strong> <ins>Active Compute Node</ins></span>
+                    <span><strong>Arch:</strong> Atheros AR9331 (MIPS @ 400 MHz)</span>
+                    <span><strong>Class:</strong> Router / Central Hub</span>
+                    <span><strong>Donor:</strong> <a href="https://github.com/0rayn">Taha Ed-dafili</a></span>
                 </div>
             </header>
 
             
+            
+            <section>
+                <h3>[ Initial State ]</h3>
+                <div class="photo-grid">
+                    
+                        
+                        <img src="/hardware/wnh-001-tl-mr3020/initial/router_hu_7e7ace5052293a4f.png" 
+                             onclick="openLightbox('\/hardware\/wnh-001-tl-mr3020\/initial\/router.png')" 
+                             alt="Initial Hardware State">
+                    
+                        
+                        <img src="/hardware/wnh-001-tl-mr3020/initial/routerInsides_hu_ad08d7dcbec7532c.png" 
+                             onclick="openLightbox('\/hardware\/wnh-001-tl-mr3020\/initial\/routerInsides.png')" 
+                             alt="Initial Hardware State">
+                    
+                </div>
+            </section>
             
 
             <section>
@@ -64,7 +81,15 @@
                 
                     
                     <div class="log-entry">
-                        <code>2026-04-21</code>: Device received and cataloged.
+                        <code>2025-06-11</code>: Flashed custom OpenWrt (17.01.7), configured EXT4 USB overlay, and exposed UART serial pins.
+                    </div>
+                    
+                    <div class="log-entry">
+                        <code>2026-01-13</code>: System expanded into &#39;The 3020 Project&#39; architecture. Dropped USB storage support to fit USB HID keyboard drivers.
+                    </div>
+                    
+                    <div class="log-entry">
+                        <code>2026-04-21</code>: Device officially cataloged into the WNH ledger.
                     </div>
                     
                 
@@ -72,20 +97,85 @@
 
             
             
+            <section>
+                <h3>[ Current Build ]</h3>
+                <div class="photo-grid">
+                    
+                        
+                        <img src="/hardware/wnh-001-tl-mr3020/current/overallsystem_hu_fae20a58d985b53e.png" 
+                             onclick="openLightbox('\/hardware\/wnh-001-tl-mr3020\/current\/overallsystem.png')" 
+                             alt="Current Hardware State">
+                    
+                        
+                        <img src="/hardware/wnh-001-tl-mr3020/current/routerInside_hu_b3e619fa1637488a.png" 
+                             onclick="openLightbox('\/hardware\/wnh-001-tl-mr3020\/current\/routerInside.png')" 
+                             alt="Current Hardware State">
+                    
+                        
+                        <img src="/hardware/wnh-001-tl-mr3020/current/screen_hu_181f335b79fa45db.jpeg" 
+                             onclick="openLightbox('\/hardware\/wnh-001-tl-mr3020\/current\/screen.jpeg')" 
+                             alt="Current Hardware State">
+                    
+                        
+                        <img src="/hardware/wnh-001-tl-mr3020/current/screen2_hu_203cddce19edd614.jpeg" 
+                             onclick="openLightbox('\/hardware\/wnh-001-tl-mr3020\/current\/screen2.jpeg')" 
+                             alt="Current Hardware State">
+                    
+                </div>
+            </section>
+            
 
             
             <section>
                 <h3>[ Notes ]</h3>
                 <div style="font-size: 0.95rem;">
                     <h2 id="technical-overview">Technical Overview</h2>
-<p>[Provide a brief description of the hardware state and the intended project.]</p>
-<h2 id="rescue-log">Rescue Log</h2>
-<p>[Add detailed notes here&hellip;]</p>
+<p>Originally designed as a portable 3G/4G wireless travel router, this device has been entirely repurposed as the central orchestrator for a distributed, e-waste-built terminal known as <strong>The 3020 Project</strong>.</p>
+<p>Running a highly customized OpenWrt Linux environment, the router acts as the system&rsquo;s &ldquo;core.&rdquo; Instead of forcing the limited hardware to generate video or read sensors directly, it delegates tasks, routing I/O logic between specialized microcontrollers via TCP/IP and Serial connections.</p>
+<h2 id="hardware--software-modifications">Hardware &amp; Software Modifications</h2>
+<ul>
+<li><strong>OS Environment:</strong> Custom OpenWrt build (lede-17.01.7). The stock firmware was wiped to grant a writable filesystem, SSH access, and package manager control.</li>
+<li><strong>UART Serial Access:</strong> The unpopulated header holes near the board&rsquo;s edge (TX, RX, GND) were tapped to provide direct access to the boot messages and system console.</li>
+<li><strong>The Distributed Architecture:</strong> * <strong>Graphics (ESP32):</strong> The router connects to an ESP32 over TCP port 1337, sending text strings that the ESP32 renders to a VGA monitor.
+<ul>
+<li><strong>Physical I/O (Arduino Nano):</strong> Connected via the router&rsquo;s internal serial port (<code>/dev/ttyATH0</code>), handling physical sensors, actuators, and I²C LCD screens via text commands.</li>
+<li><strong>Input (<code>3020-Keyboard</code>):</strong> A custom C program reads raw keystrokes from the Linux event subsystem (<code>/dev/input/event0</code>) and splits the signal, mirroring text to the ESP32 display while passing executable commands to the Nano.</li>
+</ul>
+</li>
+</ul>
 
                 </div>
             </section>
             
         </div>
+
+        <dialog id="lightbox">
+            <article style="background: transparent; border: none; box-shadow: none; max-width: 95vw; display: flex; flex-direction: column; align-items: center;">
+                <a href="#close" aria-label="Close" class="close" onclick="closeLightbox(event)" style="align-self: flex-end; margin-bottom: 1rem;"></a>
+                <img id="lightbox-img" src="" style="max-height: 80vh; border-radius: 8px; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: zoom-out;" onclick="closeLightbox(event)">
+            </article>
+        </dialog>
     </main>
+
+    <script>
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(highResUrl) {
+            lightboxImg.src = highResUrl;
+            lightbox.showModal();
+        }
+
+        function closeLightbox(event) {
+            event.preventDefault();
+            lightbox.close();
+        }
+
+        lightbox.addEventListener('click', function(event) {
+            if (event.target === lightbox) {
+                lightbox.close();
+            }
+        });
+    </script>
 </body>
 </html>

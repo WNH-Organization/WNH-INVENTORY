@@ -3,10 +3,19 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:1313/hardware/</loc>
-    <lastmod>2026-04-21T17:51:28+01:00</lastmod>
+    <lastmod>2026-04-21T17:59:41+01:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2026-04-21T17:51:28+01:00</lastmod>
+    <lastmod>2026-04-21T17:59:41+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/hardware/wnh-004-daewoo-dpc-7900pd/</loc>
+    <lastmod>2026-04-21T17:59:41+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/hardware/wnh-003-casio-pocket-tv-1400/</loc>
+    <lastmod>2026-04-21T17:59:12+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/hardware/wnh-002-honor-x7/</loc>
+    <lastmod>2026-04-21T17:58:17+01:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/hardware/wnh-001-tl-mr3020/</loc>
     <lastmod>2026-04-21T17:51:28+01:00</lastmod>

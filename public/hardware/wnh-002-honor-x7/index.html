@@ -1,44 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
     <meta charset="utf-8">
-    <title>Wnh 002 Honor X7 - WNH Ledger</title>
+    <title>Wnh 002 Honor X7 // WNH</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+         
+        :root { 
+            --pico-font-family: 'Fira Code', monospace; 
+            --pico-primary: #4ade80; 
+            --pico-spacing: 0.5rem;  
+            --pico-typography-spacing-vertical: 0.5rem;
+        }
+        body { font-size: 14px; line-height: 1.4; background: #0d1117; }
+        
+         
+        .terminal-box { 
+            border: 1px solid #30363d; 
+            background: #161b22; 
+            padding: 1rem; 
+            margin-top: 1rem;
+        }
+
+         
+        h1 { font-size: 1.4rem; margin-bottom: 0; }
+        h3 { font-size: 1rem; text-transform: uppercase; color: #8b949e; border-bottom: 1px dashed #30363d; padding-bottom: 0.2rem; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .meta-row { font-size: 0.85rem; color: #8b949e; margin-bottom: 1rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+        .meta-row strong { color: #c9d1d9; }
+        
+         
+        .log-entry { font-size: 0.9rem; border-left: 2px solid var(--pico-primary); padding-left: 0.5rem; margin-bottom: 0.4rem; }
+        
+         
+        .photo-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .photo-grid img { height: 120px; width: auto; max-width: 200px; object-fit: cover; border: 1px solid #30363d; border-radius: 4px; opacity: 0.8; transition: opacity 0.2s; }
+        .photo-grid img:hover { opacity: 1; }
+        
+        nav { font-size: 0.9rem; margin-top: 1rem; }
+        hr { border-color: #30363d; margin: 1rem 0; }
+    </style>
 </head>
 <body>
     <main class="container">
-        <nav>
-            <ul>
-                <li><a href="/" class="secondary">← Back to Ledger</a></li>
-            </ul>
-        </nav>
-        
-        <article>
+        <nav><a href="/" class="secondary">← Back to Ledger</a></nav>
+
+        <div class="terminal-box">
             <header>
-                <h2>Wnh 002 Honor X7</h2>
-                <p><strong>Asset ID:</strong> <code>WNH-002</code></p>
+                <h1>Wnh 002 Honor X7</h1>
+                <div class="meta-row">
+                    <span><strong>ID:</strong> <code>WNH-002</code></span>
+                    <span><strong>Status:</strong> <ins>unallocated</ins></span>
+                    <span><strong>Arch:</strong> TBD</span>
+                    <span><strong>Class:</strong> smartphone</span>
+                    <span><strong>Donor:</strong> <a href="">Soukaina Nid Bella</a></span>
+                </div>
             </header>
+
             
-            <div class="grid">
-                <div>
-                    <strong>Class:</strong> TBD<br>
-                    <strong>Architecture:</strong> TBD<br>
-                    <strong>RAM:</strong> TBD
-                </div>
-                <div>
-                    <strong>Status:</strong> <mark>Awaiting Teardown</mark><br>
-                    <strong>Donor:</strong> <a href="">Anonymous</a><br>
-                    <strong>Date Added:</strong> April 21, 2026
-                </div>
-            </div>
             
-            <hr>
+
+            <section>
+                <h3>[ Progress Log ]</h3>
+                
+                    
+                    <div class="log-entry">
+                        <code>2026-04-21</code>: Device received and cataloged.
+                    </div>
+                    
+                
+            </section>
+
+            
+            
+
             
             <section>
-                <p>Briefly describe the hardware here&hellip;</p>
+                <h3>[ Notes ]</h3>
+                <div style="font-size: 0.95rem;">
+                    <h2 id="technical-overview">Technical Overview</h2>
+<p>[Provide a brief description of the hardware state and the intended project.]</p>
+<h2 id="rescue-log">Rescue Log</h2>
+<p>[Add detailed notes here&hellip;]</p>
 
+                </div>
             </section>
-        </article>
+            
+        </div>
     </main>
 </body>
 </html>

@@ -14,6 +14,12 @@ build:
 add:
 	./new_donation.sh
 
+# Compress all raw images in the hardware directory (requires ImageMagick)
+compress:
+	find content/hardware/ -type f \( -iname \*.jpg -o -iname \*.jpeg -o -iname \*.png \) \
+	-exec mogrify -resize "1920x1080>" -quality 80 {} +
+	@echo "All images crushed to web-friendly sizes."
+
 # Clean up the generated files
 clean:
 	rm -rf public/
