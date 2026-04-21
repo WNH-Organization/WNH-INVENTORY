@@ -1,23 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="utf-8">
-    <title>WNH Hardware Ledger</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WNH // Hardware Ledger</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        :root {
+            --pico-font-family: 'Fira Code', 'Courier New', monospace;
+            --pico-primary: #4ade80; /* Terminal Green */
+            --pico-background-color: #0d1117;
+        }
+        ins { color: var(--pico-primary); text-decoration: none; }
+        code { color: #ff79c6; } /* Pink accent for IDs */
+        .search-container { margin-bottom: 2rem; }
+        #search-input { border: 1px solid #30363d; background: #161b22; }
+        table tr td { vertical-align: middle; }
+        .status-badge { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid; }
+    </style>
 </head>
 <body>
     <main class="container">
-        <h1>Why Not Hardware: Donation Ledger</h1>
-        <p>A transparent database of intercepted e-waste repurposed for low-level systems engineering.</p>
-        
+        <header>
+            <hgroup>
+                <h1><ins>WNH</ins> Hardware Ledger</h1>
+                <p>Intercepted e-waste inventory // Why Not Hardware Initiative</p>
+            </hgroup>
+        </header>
+
+        <section class="search-container">
+            <input type="search" id="search-input" placeholder="Filter by name, class, donor, or architecture..." onkeyup="filterTable()">
+        </section>
+
         <figure>
-            <table role="grid">
+            <table role="grid" id="hardware-table">
                 <thead>
                     <tr>
-                        <th scope="col">Asset ID</th>
+                        <th scope="col">ID</th>
                         <th scope="col">Device</th>
                         <th scope="col">Class</th>
-                        <th scope="col">Architecture</th>
+                        <th scope="col">Arch</th>
                         <th scope="col">Status</th>
                         <th scope="col">Donor</th>
                     </tr>
@@ -26,16 +48,34 @@
                     {{ range where .Site.RegularPages "Section" "hardware" }}
                     <tr>
                         <td><code>{{ .Params.asset_id }}</code></td>
-                        <td><a href="{{ .Permalink }}">{{ .Title }}</a></td>
+                        <td><strong><a href="{{ .Permalink }}">{{ .Title }}</a></strong></td>
                         <td>{{ .Params.class }}</td>
-                        <td>{{ .Params.architecture }}</td>
-                        <td>{{ .Params.status }}</td>
-                        <td><a href="{{ .Params.donor_link }}" target="_blank">{{ .Params.donor }}</a></td>
+                        <td><small>{{ .Params.architecture }}</small></td>
+                        <td><span class="status-badge">{{ .Params.status }}</span></td>
+                        <td><a href="{{ .Params.donor_link }}" class="secondary">{{ .Params.donor }}</a></td>
                     </tr>
                     {{ end }}
                 </tbody>
             </table>
         </figure>
     </main>
+
+    <script>
+    function filterTable() {
+        const input = document.getElementById("search-input");
+        const filter = input.value.toUpperCase();
+        const table = document.getElementById("hardware-table");
+        const tr = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < tr.length; i++) {
+            let rowText = tr[i].textContent || tr[i].innerText;
+            if (rowText.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+    </script>
 </body>
 </html>

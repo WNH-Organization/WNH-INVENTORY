@@ -1,43 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="utf-8">
-    <title>{{ .Title }} - WNH Ledger</title>
+    <title>{{ .Title }} // WNH</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        /* 1. Global Shrink & Compact Spacing */
+        :root { 
+            --pico-font-family: 'Fira Code', monospace; 
+            --pico-primary: #4ade80; 
+            --pico-spacing: 0.5rem; /* Forces Pico to stop using huge margins */
+            --pico-typography-spacing-vertical: 0.5rem;
+        }
+        body { font-size: 14px; line-height: 1.4; background: #0d1117; }
+        
+        /* 2. Tight Terminal Box */
+        .terminal-box { 
+            border: 1px solid #30363d; 
+            background: #161b22; 
+            padding: 1rem; 
+            margin-top: 1rem;
+        }
+
+        /* 3. Smaller Headers & Data Rows */
+        h1 { font-size: 1.4rem; margin-bottom: 0; }
+        h3 { font-size: 1rem; text-transform: uppercase; color: #8b949e; border-bottom: 1px dashed #30363d; padding-bottom: 0.2rem; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .meta-row { font-size: 0.85rem; color: #8b949e; margin-bottom: 1rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+        .meta-row strong { color: #c9d1d9; }
+        
+        /* 4. Compact Logs */
+        .log-entry { font-size: 0.9rem; border-left: 2px solid var(--pico-primary); padding-left: 0.5rem; margin-bottom: 0.4rem; }
+        
+        /* 5. Smaller, Tighter Photos */
+        .photo-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .photo-grid img { height: 120px; width: auto; max-width: 200px; object-fit: cover; border: 1px solid #30363d; border-radius: 4px; opacity: 0.8; transition: opacity 0.2s; }
+        .photo-grid img:hover { opacity: 1; }
+        
+        nav { font-size: 0.9rem; margin-top: 1rem; }
+        hr { border-color: #30363d; margin: 1rem 0; }
+    </style>
 </head>
 <body>
     <main class="container">
-        <nav>
-            <ul>
-                <li><a href="/" class="secondary">← Back to Ledger</a></li>
-            </ul>
-        </nav>
-        
-        <article>
+        <nav><a href="/" class="secondary">← Back to Ledger</a></nav>
+
+        <div class="terminal-box">
             <header>
-                <h2>{{ .Title }}</h2>
-                <p><strong>Asset ID:</strong> <code>{{ .Params.asset_id }}</code></p>
+                <h1>{{ .Title }}</h1>
+                <div class="meta-row">
+                    <span><strong>ID:</strong> <code>{{ .Params.asset_id }}</code></span>
+                    <span><strong>Status:</strong> <ins>{{ .Params.status }}</ins></span>
+                    <span><strong>Arch:</strong> {{ .Params.architecture }}</span>
+                    <span><strong>Class:</strong> {{ .Params.class }}</span>
+                    <span><strong>Donor:</strong> <a href="{{ .Params.donor_link }}">{{ .Params.donor }}</a></span>
+                </div>
             </header>
-            
-            <div class="grid">
-                <div>
-                    <strong>Class:</strong> {{ .Params.class }}<br>
-                    <strong>Architecture:</strong> {{ .Params.architecture }}<br>
-                    <strong>RAM:</strong> {{ .Params.ram }}
-                </div>
-                <div>
-                    <strong>Status:</strong> <mark>{{ .Params.status }}</mark><br>
-                    <strong>Donor:</strong> <a href="{{ .Params.donor_link }}">{{ .Params.donor }}</a><br>
-                    <strong>Date Added:</strong> {{ .Date.Format "January 2, 2006" }}
-                </div>
-            </div>
-            
-            <hr>
-            
+
+            {{ $initial := .Resources.Match "initial/*" }}
+            {{ if $initial }}
             <section>
-                {{ .Content }}
+                <h3>[ Initial State ]</h3>
+                <div class="photo-grid">
+                    {{ range $initial }}
+                        {{ $opt := .Fit "400x300 q85" }}
+                        <a href="{{ .RelPermalink }}"><img src="{{ $opt.RelPermalink }}"></a>
+                    {{ end }}
+                </div>
             </section>
-        </article>
+            {{ end }}
+
+            <section>
+                <h3>[ Progress Log ]</h3>
+                {{ if .Params.updates }}
+                    {{ range .Params.updates }}
+                    <div class="log-entry">
+                        <code>{{ .date }}</code>: {{ .note }}
+                    </div>
+                    {{ end }}
+                {{ else }}
+                    <div class="log-entry" style="border-color: #8b949e; color: #8b949e;">No updates registered.</div>
+                {{ end }}
+            </section>
+
+            {{ $current := .Resources.Match "current/*" }}
+            {{ if $current }}
+            <section>
+                <h3>[ Current Build ]</h3>
+                <div class="photo-grid">
+                    {{ range $current }}
+                        {{ $opt := .Fit "400x300 q85" }}
+                        <a href="{{ .RelPermalink }}"><img src="{{ $opt.RelPermalink }}"></a>
+                    {{ end }}
+                </div>
+            </section>
+            {{ end }}
+
+            {{ if .Content }}
+            <section>
+                <h3>[ Notes ]</h3>
+                <div style="font-size: 0.95rem;">
+                    {{ .Content }}
+                </div>
+            </section>
+            {{ end }}
+        </div>
     </main>
 </body>
 </html>

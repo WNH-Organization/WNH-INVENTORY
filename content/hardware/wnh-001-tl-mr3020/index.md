@@ -1,15 +1,15 @@
 ---
-title: "{{ replace .Name "-" " " | title }}"
-asset_id: "WNH-TBD"
-class: "CLASS-TBD"
+title: "Wnh 001 Tl Mr3020"
+asset_id: "WNH-001"
+class: "router"
 architecture: "TBD"
 ram: "TBD"
 status: "unallocated"
-donor: "DONOR-TBD"
+donor: "Taha Ed-dafili"
 donor_link: ""
-date: {{ .Date }}
+date: 2026-04-21T17:51:28+01:00
 updates:
-  - date: "{{ now.Format "2006-01-02" }}"
+  - date: "2026-04-21"
     note: "Device received and cataloged."
 ---
 

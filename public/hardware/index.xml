@@ -6,14 +6,14 @@
     <description>Recent content in Hardwares on My New Hugo Project</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 21 Apr 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 21 Apr 2026 17:51:28 +0100</lastBuildDate>
     <atom:link href="http://localhost:1313/hardware/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>TP-Link TL-MR3020</title>
-      <link>http://localhost:1313/hardware/tl-mr3020/</link>
-      <pubDate>Tue, 21 Apr 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/hardware/tl-mr3020/</guid>
-      <description>&lt;p&gt;This router was intercepted before hitting the e-waste bin. Currently flashed with OpenWrt and serving as a local network bridge for the lab.&lt;/p&gt;</description>
+      <title>Wnh 001 Tl Mr3020</title>
+      <link>http://localhost:1313/hardware/wnh-001-tl-mr3020/</link>
+      <pubDate>Tue, 21 Apr 2026 17:51:28 +0100</pubDate>
+      <guid>http://localhost:1313/hardware/wnh-001-tl-mr3020/</guid>
+      <description>&lt;h2 id=&#34;technical-overview&#34;&gt;Technical Overview&lt;/h2&gt;&#xA;&lt;p&gt;[Provide a brief description of the hardware state and the intended project.]&lt;/p&gt;&#xA;&lt;h2 id=&#34;rescue-log&#34;&gt;Rescue Log&lt;/h2&gt;&#xA;&lt;p&gt;[Add detailed notes here&amp;hellip;]&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

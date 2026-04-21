@@ -1,38 +1,41 @@
 #!/bin/bash
 
-# 1. Find the highest existing WNH number (Defaults to 000 if empty)
+# 1. Find the highest existing WNH number
 LAST_ID=$(ls content/hardware/ 2>/dev/null | grep -oE 'wnh-[0-9]+' | grep -oE '[0-9]+' | sort -n | tail -1)
 LAST_ID=${LAST_ID:-0}
-
-# 2. Increment by 1 and pad with zeros (e.g., 4 becomes 005)
 NEXT_ID=$(printf "%03d" $((10#$LAST_ID + 1)))
 
-echo "Next Asset ID is WNH-$NEXT_ID"
+echo "Next Asset ID: WNH-$NEXT_ID"
 echo "---------------------------"
 
-# 3. Prompt for device details
-read -p "Enter device name (e.g., raspberry pi 4): " DEVICE_NAME
-read -p "Enter device class (e.g., Router, SBC, Smartphone): " DEVICE_CLASS
-read -p "Enter donor name (leave blank for Anonymous): " DONOR_NAME
-
-# If donor name is left blank, default to "Anonymous"
+# 2. Prompts
+read -p "Device Name: " DEVICE_NAME
+read -p "Device Class: " DEVICE_CLASS
+read -p "Donor Name (blank for Anonymous): " DONOR_NAME
 DONOR_NAME=${DONOR_NAME:-Anonymous}
 
-# 4. Format the name for the URL (lowercase, replace spaces with dashes)
+# 3. Create the Leaf Bundle directory
 SLUG=$(echo "$DEVICE_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-FILENAME="wnh-${NEXT_ID}-${SLUG}.md"
+DIRNAME="wnh-${NEXT_ID}-${SLUG}"
+TARGET_DIR="content/hardware/${DIRNAME}"
 
-# 5. Tell Hugo to generate the file using the archetype
-hugo new "hardware/${FILENAME}"
+mkdir -p "$TARGET_DIR"
+# Create subdirectories for photos
+mkdir -p "${TARGET_DIR}/initial"
+mkdir -p "${TARGET_DIR}/current"
 
-# 6. Automatically inject the correct data into the generated file using sed
-sed -i "s/WNH-TBD/WNH-${NEXT_ID}/" "content/hardware/${FILENAME}"
-sed -i "s/CLASS-TBD/${DEVICE_CLASS}/" "content/hardware/${FILENAME}"
-sed -i "s/DONOR-TBD/${DONOR_NAME}/" "content/hardware/${FILENAME}"
+# 4. Generate index.md inside that folder
+# We use 'hugo new' but point it to the index.md inside our new folder
+hugo new "hardware/${DIRNAME}/index.md"
+
+# 5. Inject data
+FINAL_FILE="${TARGET_DIR}/index.md"
+sed -i "s/WNH-TBD/WNH-${NEXT_ID}/" "$FINAL_FILE"
+sed -i "s/CLASS-TBD/${DEVICE_CLASS}/" "$FINAL_FILE"
+sed -i "s/DONOR-TBD/${DONOR_NAME}/" "$FINAL_FILE"
 
 echo "---------------------------"
-echo "Success! WNH-${NEXT_ID} registered to ${DONOR_NAME}."
-echo "Opening file..."
+echo "Directory created: $TARGET_DIR"
+echo "Drop your images there and edit the metadata."
 
-# Open the new file in Neovim (or your system default editor)
-${EDITOR:-nvim} "content/hardware/${FILENAME}"
+${EDITOR:-nvim} "$FINAL_FILE"
