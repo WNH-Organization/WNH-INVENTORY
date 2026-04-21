@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{ .Title }} - WNH Ledger</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+    <main class="container">
+        <nav>
+            <ul>
+                <li><a href="/" class="secondary">← Back to Ledger</a></li>
+            </ul>
+        </nav>
+        
+        <article>
+            <header>
+                <h2>{{ .Title }}</h2>
+                <p><strong>Asset ID:</strong> <code>{{ .Params.asset_id }}</code></p>
+            </header>
+            
+            <div class="grid">
+                <div>
+                    <strong>Class:</strong> {{ .Params.class }}<br>
+                    <strong>Architecture:</strong> {{ .Params.architecture }}<br>
+                    <strong>RAM:</strong> {{ .Params.ram }}
+                </div>
+                <div>
+                    <strong>Status:</strong> <mark>{{ .Params.status }}</mark><br>
+                    <strong>Donor:</strong> <a href="{{ .Params.donor_link }}">{{ .Params.donor }}</a><br>
+                    <strong>Date Added:</strong> {{ .Date.Format "January 2, 2006" }}
+                </div>
+            </div>
+            
+            <hr>
+            
+            <section>
+                {{ .Content }}
+            </section>
+        </article>
+    </main>
+</body>
+</html>

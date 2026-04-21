@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Hardwares on My New Hugo Project</title>
+    <link>http://localhost:1313/hardware/</link>
+    <description>Recent content in Hardwares on My New Hugo Project</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 21 Apr 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/hardware/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>TP-Link TL-MR3020</title>
+      <link>http://localhost:1313/hardware/tl-mr3020/</link>
+      <pubDate>Tue, 21 Apr 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/hardware/tl-mr3020/</guid>
+      <description>&lt;p&gt;This router was intercepted before hitting the e-waste bin. Currently flashed with OpenWrt and serving as a local network bridge for the lab.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

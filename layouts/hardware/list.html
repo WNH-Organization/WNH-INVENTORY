@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WNH Hardware Ledger</title>
+    </head>
+<body>
+    <h1>Why Not Hardware: Donation Ledger</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Asset ID</th>
+                <th>Device</th>
+                <th>Class</th>
+                <th>Architecture</th>
+                <th>Status</th>
+                <th>Donor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Pages }}
+            <tr>
+                <td><code>{{ .Params.asset_id }}</code></td>
+                <td><a href="{{ .Permalink }}">{{ .Title }}</a></td>
+                <td>{{ .Params.class }}</td>
+                <td>{{ .Params.architecture }}</td>
+                <td>{{ .Params.status }}</td>
+                <td><a href="{{ .Params.donor_link }}">{{ .Params.donor }}</a></td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</body>
+</html>

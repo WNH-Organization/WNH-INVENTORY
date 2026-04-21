@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WNH Hardware Ledger</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+    <main class="container">
+        <h1>Why Not Hardware: Donation Ledger</h1>
+        <p>A transparent database of intercepted e-waste repurposed for low-level systems engineering.</p>
+        
+        <figure>
+            <table role="grid">
+                <thead>
+                    <tr>
+                        <th scope="col">Asset ID</th>
+                        <th scope="col">Device</th>
+                        <th scope="col">Class</th>
+                        <th scope="col">Architecture</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Donor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range where .Site.RegularPages "Section" "hardware" }}
+                    <tr>
+                        <td><code>{{ .Params.asset_id }}</code></td>
+                        <td><a href="{{ .Permalink }}">{{ .Title }}</a></td>
+                        <td>{{ .Params.class }}</td>
+                        <td>{{ .Params.architecture }}</td>
+                        <td>{{ .Params.status }}</td>
+                        <td><a href="{{ .Params.donor_link }}" target="_blank">{{ .Params.donor }}</a></td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </figure>
+    </main>
+</body>
+</html>
