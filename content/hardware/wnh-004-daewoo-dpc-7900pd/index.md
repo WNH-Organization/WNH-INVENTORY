@@ -1,5 +1,5 @@
 ---
-title: "Wnh 004 Daewoo Dpc 7900pd"
+title: "Daewoo Dpc 7900pd"
 asset_id: "WNH-004"
 class: "portable DVD player"
 architecture: "TBD"

@@ -1,5 +1,5 @@
 ---
-title: "Wnh 003 Casio Pocket Tv 1400"
+title: "Casio Pocket Tv 1400"
 asset_id: "WNH-003"
 class: "TV"
 architecture: "TBD"

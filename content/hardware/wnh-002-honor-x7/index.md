@@ -1,5 +1,5 @@
 ---
-title: "Wnh 002 Honor X7"
+title: "Honor X7"
 asset_id: "WNH-002"
 class: "smartphone"
 architecture: "TBD"
