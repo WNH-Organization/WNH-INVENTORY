@@ -1,4 +1,4 @@
-name: Deploy WNH Ledger to GitHub Pages
+name: Deploy WNH Inventory to GitHub Pages
 
 on:
   # Runs on pushes targeting the default branch

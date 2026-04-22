@@ -16,7 +16,7 @@ updates:
   - date: "2026-01-13"
     note: "System expanded into 'The 3020 Project' architecture. Dropped USB storage support to fit USB HID keyboard drivers."
   - date: "2026-04-21"
-    note: "Device officially cataloged into the WNH ledger."
+    note: "Device officially cataloged into the WNH Inventory."
 ---
 
 ## Technical Overview

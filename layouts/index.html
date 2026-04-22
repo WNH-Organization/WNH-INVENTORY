@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WNH // Hardware Ledger</title>
+    <title>WNH // Hardware Inventory</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
@@ -143,7 +143,7 @@
             white-space: nowrap;
         }
 
-        #ledger-search {
+        #inventory-search {
             width: 100%;
             background: var(--bg-panel);
             border: 1px solid var(--border);
@@ -156,8 +156,8 @@
             transition: border-color 0.15s;
         }
 
-        #ledger-search:focus { border-color: var(--green); }
-        #ledger-search::placeholder { color: var(--txt-muted); }
+        #inventory-search:focus { border-color: var(--green); }
+        #inventory-search::placeholder { color: var(--txt-muted); }
 
         .filter-wrap {
             display: flex;
@@ -193,7 +193,7 @@
         }
 
         /* ── TABLE ──────────────────────────────────────────────── */
-        .ledger-wrap {
+        .inventory-wrap {
             border: 1px solid var(--border);
             overflow-x: auto;
         }
@@ -425,11 +425,11 @@
             <span class="search-prefix">grep -i</span>
             <input
                 type="search"
-                id="ledger-search"
+                id="inventory-search"
                 placeholder="filter rows…"
                 autocomplete="off"
                 spellcheck="false"
-                aria-label="Search hardware ledger"
+                aria-label="Search hardware inventory"
             >
         </div>
         <div class="filter-wrap" aria-label="Filter by status">
@@ -441,8 +441,8 @@
         <span class="result-count" id="row-count" aria-live="polite"></span>
     </div>
 
-    <div class="ledger-wrap">
-        <table id="ledger-table" aria-label="Hardware Ledger">
+    <div class="inventory-wrap">
+        <table id="inventory-table" aria-label="Hardware Inventory">
             <thead>
                 <tr>
                     <th data-sort="id">ASSET ID <span class="sort-indicator">↕</span></th>
@@ -455,7 +455,7 @@
                     <th data-sort="date">LOGGED <span class="sort-indicator">↕</span></th>
                 </tr>
             </thead>
-            <tbody id="ledger-body">
+            <tbody id="inventory-body">
                 {{- $pages := where .Site.RegularPages "Section" "hardware" -}}
                 {{- range $pages.ByParam "asset_id" -}}
                 {{- $statusClass := "badge-default" -}}
@@ -505,7 +505,7 @@
     </div>
 
     <footer class="site-footer">
-        <span>WHY NOT HARDWARE // e-waste rescue ledger</span>
+        <span>WHY NOT HARDWARE // e-waste rescue inventory</span>
         <span>{{ len (where .Site.RegularPages "Section" "hardware") }} device(s) cataloged</span>
     </footer>
 
@@ -515,9 +515,9 @@
 (function () {
     'use strict';
 
-    const searchInput  = document.getElementById('ledger-search');
+    const searchInput  = document.getElementById('inventory-search');
     const filterBtns   = document.querySelectorAll('.filter-btn');
-    const rows         = Array.from(document.querySelectorAll('#ledger-body tr'));
+    const rows         = Array.from(document.querySelectorAll('#inventory-body tr'));
     const rowCount     = document.getElementById('row-count');
     const emptyState   = document.getElementById('empty-state');
     const emptyQuery   = document.getElementById('empty-query');
@@ -578,7 +578,7 @@
             }
         });
 
-        const tbody = document.getElementById('ledger-body');
+        const tbody = document.getElementById('inventory-body');
         const sorted = [...rows].sort((a, b) => {
             const av = a.dataset[key] || '';
             const bv = b.dataset[key] || '';

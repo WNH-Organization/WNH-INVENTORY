@@ -1,4 +1,4 @@
-# Makefile for WNH Ledger
+# Makefile for WNH Inventory
 
 .PHONY: dev build clean
 
