@@ -25,14 +25,16 @@ mkdir -p "${TARGET_DIR}/initial"
 mkdir -p "${TARGET_DIR}/current"
 
 # 4. Generate index.md inside that folder
-# We use 'hugo new' but point it to the index.md inside our new folder
 hugo new "hardware/${DIRNAME}/index.md"
 
 # 5. Inject data
 FINAL_FILE="${TARGET_DIR}/index.md"
-sed -i "s/WNH-TBD/WNH-${NEXT_ID}/" "$FINAL_FILE"
-sed -i "s/CLASS-TBD/${DEVICE_CLASS}/" "$FINAL_FILE"
-sed -i "s/DONOR-TBD/${DONOR_NAME}/" "$FINAL_FILE"
+
+# Using | as delimiter in sed to prevent errors if DEVICE_NAME contains a slash
+sed -i "s|TITLE-TBD|${DEVICE_NAME}|" "$FINAL_FILE"
+sed -i "s|WNH-TBD|WNH-${NEXT_ID}|" "$FINAL_FILE"
+sed -i "s|CLASS-TBD|${DEVICE_CLASS}|" "$FINAL_FILE"
+sed -i "s|DONOR-TBD|${DONOR_NAME}|" "$FINAL_FILE"
 
 echo "---------------------------"
 echo "Directory created: $TARGET_DIR"

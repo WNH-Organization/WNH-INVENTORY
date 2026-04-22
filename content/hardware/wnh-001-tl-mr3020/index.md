@@ -4,9 +4,11 @@ asset_id: "WNH-001"
 class: "Router / Central Hub"
 architecture: "Atheros AR9331 (MIPS @ 400 MHz)"
 ram: "32 MB (4 MB Flash)"
-status: "Active Compute Node"
+status: "Active"
 donor: "Taha Ed-dafili"
 donor_link: "https://github.com/0rayn"
+operator: "Taha Ed-dafili"
+operator_link: "https://github.com/0rayn"
 date: 2026-04-21T17:51:28+01:00
 updates:
   - date: "2025-06-11"

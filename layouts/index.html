@@ -180,7 +180,7 @@
 
         .filter-btn:hover         { border-color: var(--txt-secondary); color: var(--txt-primary); }
         .filter-btn.active        { border-color: var(--green); color: var(--green); }
-        .filter-btn[data-filter="Active Compute Node"].active { border-color: var(--green); color: var(--green); }
+        .filter-btn[data-filter="Active"].active { border-color: var(--green); color: var(--green); }
         .filter-btn[data-filter="unallocated"].active         { border-color: var(--yellow); color: var(--yellow); }
         .filter-btn[data-filter="Awaiting Triage"].active     { border-color: var(--red); color: var(--red); }
 
@@ -281,17 +281,17 @@
             text-overflow: ellipsis;
         }
 
-        td.td-donor {
+        td.td-donor, td.td-operator {
             color: var(--txt-secondary);
             font-size: 0.78rem;
         }
 
-        td.td-donor a {
+        td.td-donor a, td.td-operator a {
             color: var(--txt-secondary);
             text-decoration: none;
         }
 
-        td.td-donor a:hover { color: var(--blue); }
+        td.td-donor a:hover, td.td-operator a:hover { color: var(--blue); }
 
         td.td-date {
             color: var(--txt-muted);
@@ -387,7 +387,6 @@
 <body>
 <div class="shell">
 
-    <!-- HEADER -->
     <header class="site-header">
         <div class="header-top">
             <a href="/" class="site-logo">WHY NOT HARDWARE</a>
@@ -395,7 +394,7 @@
         </div>
         <div class="stats-bar">
             {{- $all   := where .Site.RegularPages "Section" "hardware" -}}
-            {{- $active := where $all ".Params.status" "Active Compute Node" -}}
+            {{- $active := where $all ".Params.status" "Active" -}}
             {{- $unalloc := where $all ".Params.status" "unallocated" -}}
             {{- $triage  := where $all ".Params.status" "Awaiting Triage" -}}
             <div class="stat-item">
@@ -421,7 +420,6 @@
         </div>
     </header>
 
-    <!-- TOOLBAR -->
     <div class="toolbar">
         <div class="search-wrap">
             <span class="search-prefix">grep -i</span>
@@ -436,14 +434,13 @@
         </div>
         <div class="filter-wrap" aria-label="Filter by status">
             <button class="filter-btn active" data-filter="ALL">ALL</button>
-            <button class="filter-btn" data-filter="Active Compute Node">ACTIVE</button>
+            <button class="filter-btn" data-filter="Active">ACTIVE</button>
             <button class="filter-btn" data-filter="unallocated">UNALLOC</button>
             <button class="filter-btn" data-filter="Awaiting Triage">TRIAGE</button>
         </div>
         <span class="result-count" id="row-count" aria-live="polite"></span>
     </div>
 
-    <!-- TABLE -->
     <div class="ledger-wrap">
         <table id="ledger-table" aria-label="Hardware Ledger">
             <thead>
@@ -454,6 +451,7 @@
                     <th data-sort="arch">ARCHITECTURE <span class="sort-indicator">↕</span></th>
                     <th data-sort="status">STATUS <span class="sort-indicator">↕</span></th>
                     <th data-sort="donor">DONOR <span class="sort-indicator">↕</span></th>
+                    <th data-sort="operator">OPERATOR <span class="sort-indicator">↕</span></th>
                     <th data-sort="date">LOGGED <span class="sort-indicator">↕</span></th>
                 </tr>
             </thead>
@@ -461,7 +459,7 @@
                 {{- $pages := where .Site.RegularPages "Section" "hardware" -}}
                 {{- range $pages.ByParam "asset_id" -}}
                 {{- $statusClass := "badge-default" -}}
-                {{- if eq .Params.status "Active Compute Node" -}}{{ $statusClass = "badge-active" }}{{- end -}}
+                {{- if eq .Params.status "Active" -}}{{ $statusClass = "badge-active" }}{{- end -}}
                 {{- if eq .Params.status "unallocated" -}}{{ $statusClass = "badge-unallocated" }}{{- end -}}
                 {{- if eq .Params.status "Awaiting Triage" -}}{{ $statusClass = "badge-triage" }}{{- end -}}
                 <tr
@@ -471,6 +469,7 @@
                     data-arch="{{ .Params.architecture | lower }}"
                     data-status="{{ .Params.status | lower }}"
                     data-donor="{{ .Params.donor | lower }}"
+                    data-operator="{{ .Params.operator | default "—" | lower }}"
                     data-date="{{ .Date.Format "2006-01-02" }}"
                 >
                     <td class="td-id"><code>{{ .Params.asset_id }}</code></td>
@@ -487,6 +486,13 @@
                         {{ .Params.donor }}
                         {{- end -}}
                     </td>
+                    <td class="td-operator">
+                        {{- if .Params.operator_link -}}
+                        <a href="{{ .Params.operator_link }}" target="_blank" rel="noopener">{{ .Params.operator }}</a>
+                        {{- else -}}
+                        {{ .Params.operator | default "—" }}
+                        {{- end -}}
+                    </td>
                     <td class="td-date">{{ .Date.Format "2006-01-02" }}</td>
                 </tr>
                 {{- end }}
@@ -498,7 +504,6 @@
         </div>
     </div>
 
-    <!-- FOOTER -->
     <footer class="site-footer">
         <span>WHY NOT HARDWARE // e-waste rescue ledger</span>
         <span>{{ len (where .Site.RegularPages "Section" "hardware") }} device(s) cataloged</span>
@@ -533,7 +538,8 @@
                 row.dataset.device,
                 row.dataset.arch,
                 row.dataset.class,
-                row.dataset.donor
+                row.dataset.donor,
+                row.dataset.operator
             ].join(' ');
 
             const matchesSearch = !query || searchFields.includes(query);

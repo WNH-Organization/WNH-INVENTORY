@@ -469,7 +469,6 @@
 <body>
 <div class="shell">
 
-    <!-- BREADCRUMB -->
     <nav class="top-nav" aria-label="Breadcrumb">
         <a href="/">WHY NOT HARDWARE</a>
         <span class="sep">/</span>
@@ -478,10 +477,8 @@
         <span class="cur">{{ .Params.asset_id }}</span>
     </nav>
 
-    <!-- MAIN PANEL -->
     <div class="device-panel">
 
-        <!-- PANEL HEADER -->
         <header class="panel-header">
             <div class="panel-titlebar">
                 <div class="panel-dots">
@@ -530,6 +527,18 @@
                         {{- end -}}
                     </span>
                 </div>
+                {{ if .Params.operator }}
+                <div class="meta-item">
+                    <span class="meta-key">operator:</span>
+                    <span class="meta-val">
+                        {{- if .Params.operator_link -}}
+                        <a href="{{ .Params.operator_link }}" target="_blank" rel="noopener">{{ .Params.operator }}</a>
+                        {{- else -}}
+                        {{ .Params.operator }}
+                        {{- end -}}
+                    </span>
+                </div>
+                {{ end }}
                 <div class="meta-item" style="margin-left:auto">
                     <span class="meta-key">logged:</span>
                     <span class="meta-val">{{ .Date.Format "2006-01-02" }}</span>
@@ -537,7 +546,6 @@
             </div>
         </header>
 
-        <!-- SPEC TABLE (always shown) -->
         <div class="section-block">
             <div class="section-label">Hardware Specs</div>
             <table class="spec-table">
@@ -574,13 +582,22 @@
                     </td>
                 </tr>
                 <tr>
+                    <th>Operator</th>
+                    <td>
+                        {{- if .Params.operator_link -}}
+                        <a href="{{ .Params.operator_link }}" target="_blank" rel="noopener">{{ .Params.operator }}</a>
+                        {{- else -}}
+                        {{ .Params.operator | default "—" }}
+                        {{- end -}}
+                    </td>
+                </tr>
+                <tr>
                     <th>Date Logged</th>
                     <td>{{ .Date.Format "2006-01-02 15:04 MST" }}</td>
                 </tr>
             </table>
         </div>
 
-        <!-- INITIAL STATE PHOTOS -->
         {{- $initial := .Resources.Match "initial/*" -}}
         {{- if $initial }}
         <div class="section-block">
@@ -606,7 +623,6 @@
         </div>
         {{- end }}
 
-        <!-- PROGRESS LOG -->
         <div class="section-block">
             <div class="section-label">Progress Log</div>
             <div class="log-timeline">
@@ -626,7 +642,6 @@
             </div>
         </div>
 
-        <!-- CURRENT BUILD PHOTOS -->
         {{- $current := .Resources.Match "current/*" -}}
         {{- if $current }}
         <div class="section-block">
@@ -652,7 +667,6 @@
         </div>
         {{- end }}
 
-        <!-- MARKDOWN CONTENT NOTES -->
         {{- if .Content }}
         <div class="section-block">
             <div class="section-label">Notes</div>
@@ -662,18 +676,12 @@
         </div>
         {{- end }}
 
-    </div><!-- /.device-panel -->
-
-    <!-- FOOTER -->
-    <footer class="page-footer">
+    </div><footer class="page-footer">
         <a href="/" style="color:var(--txt-secondary);text-decoration:none">← back to ledger</a>
         <span>last mod: {{ .Lastmod.Format "2006-01-02" }}</span>
     </footer>
 
-</div><!-- /.shell -->
-
-<!-- LIGHTBOX DIALOG -->
-<dialog id="lightbox" aria-label="Image lightbox" aria-modal="true">
+</div><dialog id="lightbox" aria-label="Image lightbox" aria-modal="true">
     <div class="lightbox-inner">
         <div class="lightbox-toolbar">
             <span id="lightbox-caption" style="font-size:0.75rem;color:var(--txt-muted)"></span>

@@ -1,5 +1,5 @@
 ---
-title: "{{ replace .Name "-" " " | title }}"
+title: "TITLE-TBD"
 asset_id: "WNH-TBD"
 class: "CLASS-TBD"
 architecture: "TBD"
@@ -7,6 +7,8 @@ ram: "TBD"
 status: "unallocated"
 donor: "DONOR-TBD"
 donor_link: ""
+operator: "TBD"
+operator_link: ""
 date: {{ .Date }}
 updates:
   - date: "{{ now.Format "2006-01-02" }}"

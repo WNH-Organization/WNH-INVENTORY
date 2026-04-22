@@ -7,6 +7,8 @@ ram: "TBD"
 status: "unallocated"
 donor: "Taha Ed-dafili"
 donor_link: ""
+operator: "TBD"
+operator_link: ""
 date: 2026-04-21T17:59:41+01:00
 updates:
   - date: "2026-04-21"

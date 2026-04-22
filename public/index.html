@@ -181,7 +181,7 @@
 
         .filter-btn:hover         { border-color: var(--txt-secondary); color: var(--txt-primary); }
         .filter-btn.active        { border-color: var(--green); color: var(--green); }
-        .filter-btn[data-filter="Active Compute Node"].active { border-color: var(--green); color: var(--green); }
+        .filter-btn[data-filter="Active"].active { border-color: var(--green); color: var(--green); }
         .filter-btn[data-filter="unallocated"].active         { border-color: var(--yellow); color: var(--yellow); }
         .filter-btn[data-filter="Awaiting Triage"].active     { border-color: var(--red); color: var(--red); }
 
@@ -282,17 +282,17 @@
             text-overflow: ellipsis;
         }
 
-        td.td-donor {
+        td.td-donor, td.td-operator {
             color: var(--txt-secondary);
             font-size: 0.78rem;
         }
 
-        td.td-donor a {
+        td.td-donor a, td.td-operator a {
             color: var(--txt-secondary);
             text-decoration: none;
         }
 
-        td.td-donor a:hover { color: var(--blue); }
+        td.td-donor a:hover, td.td-operator a:hover { color: var(--blue); }
 
         td.td-date {
             color: var(--txt-muted);
@@ -388,7 +388,6 @@
 <body>
 <div class="shell">
 
-    
     <header class="site-header">
         <div class="header-top">
             <a href="/" class="site-logo">WHY NOT HARDWARE</a>
@@ -412,12 +411,11 @@
             </div>
             <div class="stat-item" style="margin-left:auto">
                 <span style="color:var(--txt-muted)">GENERATED</span>
-                <span class="stat-val">2026-04-22 19:42 UTC</span>
+                <span class="stat-val">2026-04-22 20:01 UTC</span>
             </div>
         </div>
     </header>
 
-    
     <div class="toolbar">
         <div class="search-wrap">
             <span class="search-prefix">grep -i</span>
@@ -432,14 +430,13 @@
         </div>
         <div class="filter-wrap" aria-label="Filter by status">
             <button class="filter-btn active" data-filter="ALL">ALL</button>
-            <button class="filter-btn" data-filter="Active Compute Node">ACTIVE</button>
+            <button class="filter-btn" data-filter="Active">ACTIVE</button>
             <button class="filter-btn" data-filter="unallocated">UNALLOC</button>
             <button class="filter-btn" data-filter="Awaiting Triage">TRIAGE</button>
         </div>
         <span class="result-count" id="row-count" aria-live="polite"></span>
     </div>
 
-    
     <div class="ledger-wrap">
         <table id="ledger-table" aria-label="Hardware Ledger">
             <thead>
@@ -450,6 +447,7 @@
                     <th data-sort="arch">ARCHITECTURE <span class="sort-indicator">↕</span></th>
                     <th data-sort="status">STATUS <span class="sort-indicator">↕</span></th>
                     <th data-sort="donor">DONOR <span class="sort-indicator">↕</span></th>
+                    <th data-sort="operator">OPERATOR <span class="sort-indicator">↕</span></th>
                     <th data-sort="date">LOGGED <span class="sort-indicator">↕</span></th>
                 </tr>
             </thead>
@@ -458,8 +456,9 @@
                     data-device="tp-link tl-mr3020"
                     data-class="router / central hub"
                     data-arch="atheros ar9331 (mips @ 400 mhz)"
-                    data-status="active compute node"
+                    data-status="active"
                     data-donor="taha ed-dafili"
+                    data-operator="taha ed-dafili"
                     data-date="2026-04-21"
                 >
                     <td class="td-id"><code>WNH-001</code></td>
@@ -467,9 +466,10 @@
                     <td class="td-class">Router / Central Hub</td>
                     <td class="td-arch">Atheros AR9331 (MIPS @ 400 MHz)</td>
                     <td class="td-status">
-                        <span class="badge badge-active">Active Compute Node</span>
+                        <span class="badge badge-active">Active</span>
                     </td>
                     <td class="td-donor"><a href="https://github.com/0rayn" target="_blank" rel="noopener">Taha Ed-dafili</a></td>
+                    <td class="td-operator"><a href="https://github.com/0rayn" target="_blank" rel="noopener">Taha Ed-dafili</a></td>
                     <td class="td-date">2026-04-21</td>
                 </tr><tr
                     data-id="wnh-002"
@@ -478,6 +478,7 @@
                     data-arch="tbd"
                     data-status="unallocated"
                     data-donor="soukaina nid bella"
+                    data-operator="taha ed-dafili"
                     data-date="2026-04-21"
                 >
                     <td class="td-id"><code>WNH-002</code></td>
@@ -488,6 +489,7 @@
                         <span class="badge badge-unallocated">unallocated</span>
                     </td>
                     <td class="td-donor">Soukaina Nid Bella</td>
+                    <td class="td-operator"><a href="https://github.com/0rayn" target="_blank" rel="noopener">Taha Ed-dafili</a></td>
                     <td class="td-date">2026-04-21</td>
                 </tr><tr
                     data-id="wnh-003"
@@ -496,6 +498,7 @@
                     data-arch="tbd"
                     data-status="unallocated"
                     data-donor="taha ed-dafili"
+                    data-operator="tbd"
                     data-date="2026-04-21"
                 >
                     <td class="td-id"><code>WNH-003</code></td>
@@ -506,6 +509,7 @@
                         <span class="badge badge-unallocated">unallocated</span>
                     </td>
                     <td class="td-donor">Taha Ed-dafili</td>
+                    <td class="td-operator">TBD</td>
                     <td class="td-date">2026-04-21</td>
                 </tr><tr
                     data-id="wnh-004"
@@ -514,6 +518,7 @@
                     data-arch="tbd"
                     data-status="unallocated"
                     data-donor="taha ed-dafili"
+                    data-operator="tbd"
                     data-date="2026-04-21"
                 >
                     <td class="td-id"><code>WNH-004</code></td>
@@ -524,6 +529,7 @@
                         <span class="badge badge-unallocated">unallocated</span>
                     </td>
                     <td class="td-donor">Taha Ed-dafili</td>
+                    <td class="td-operator">TBD</td>
                     <td class="td-date">2026-04-21</td>
                 </tr>
             </tbody>
@@ -534,7 +540,6 @@
         </div>
     </div>
 
-    
     <footer class="site-footer">
         <span>WHY NOT HARDWARE // e-waste rescue ledger</span>
         <span>4 device(s) cataloged</span>
@@ -569,7 +574,8 @@
                 row.dataset.device,
                 row.dataset.arch,
                 row.dataset.class,
-                row.dataset.donor
+                row.dataset.donor,
+                row.dataset.operator
             ].join(' ');
 
             const matchesSearch = !query || searchFields.includes(query);

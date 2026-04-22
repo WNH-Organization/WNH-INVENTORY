@@ -7,6 +7,8 @@ ram: "TBD"
 status: "unallocated"
 donor: "Soukaina Nid Bella"
 donor_link: ""
+operator: "Taha Ed-dafili"
+operator_link: "https://github.com/0rayn"
 date: 2026-04-21T17:58:17+01:00
 updates:
   - date: "2026-04-21"
