@@ -3,7 +3,7 @@ resources/_gen/
 assets/jsconfig.json
 .hugo_build.lock
 
-# The compiled website (if you build locally)
+# The compiled website
 public/
 
 # Mac OS junk (just in case)
