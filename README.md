@@ -13,7 +13,7 @@ WNH-INVENTORY is a static, highly-dense asset inventory for the WNH lab. It trac
 
 ## 🚀 Live Environment
 
-The inventory automatically compiles and deploys on every push to the `main` branch.
+The inventory automatically compiles and deploys on every push to the `main` branch.  
 **View the live inventory here:** [https://WNH-Organization.github.io/WNH-INVENTORY](https://WNH-Organization.github.io/WNH-INVENTORY)
 
 ## 🛠️ Local Development
