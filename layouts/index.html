@@ -4,78 +4,618 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>WNH // Hardware Ledger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <style>
+        /* ── RESET & TOKENS ─────────────────────────────────────── */
         :root {
-            --pico-font-family: 'Fira Code', 'Courier New', monospace;
-            --pico-primary: #4ade80; /* Terminal Green */
-            --pico-background-color: #0d1117;
+            --pico-font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            --pico-primary:     #4ade80;
+            --pico-secondary:   #94a3b8;
+            --pico-spacing:     0.4rem;
+            --pico-typography-spacing-vertical: 0.4rem;
+
+            --bg-base:    #09090b;
+            --bg-panel:   #0f1117;
+            --bg-row:     #111318;
+            --bg-hover:   #161b24;
+            --border:     #1e2533;
+            --border-dim: #161b22;
+
+            --txt-primary:   #e2e8f0;
+            --txt-secondary: #64748b;
+            --txt-muted:     #334155;
+            --txt-code:      #94a3b8;
+
+            --green:   #4ade80;
+            --yellow:  #facc15;
+            --red:     #f87171;
+            --blue:    #60a5fa;
+            --purple:  #a78bfa;
+            --cyan:    #22d3ee;
+            --orange:  #fb923c;
         }
-        ins { color: var(--pico-primary); text-decoration: none; }
-        code { color: #ff79c6; } /* Pink accent for IDs */
-        .search-container { margin-bottom: 2rem; }
-        #search-input { border: 1px solid #30363d; background: #161b22; }
-        table tr td { vertical-align: middle; }
-        .status-badge { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid; }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html, body {
+            margin: 0; padding: 0;
+            background: var(--bg-base);
+            color: var(--txt-primary);
+            font-family: var(--pico-font-family);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* ── SCANLINE TEXTURE ───────────────────────────────────── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.04) 2px,
+                rgba(0,0,0,0.04) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ── LAYOUT ─────────────────────────────────────────────── */
+        .shell {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.5rem 1.5rem;
+        }
+
+        /* ── HEADER ─────────────────────────────────────────────── */
+        .site-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .site-logo {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--green);
+            letter-spacing: 0.05em;
+            text-decoration: none;
+        }
+
+        .site-logo::before { content: '❯ '; color: var(--txt-muted); }
+
+        .site-tagline {
+            font-size: 0.78rem;
+            color: var(--txt-secondary);
+            letter-spacing: 0.02em;
+        }
+
+        /* ── STATS BAR ──────────────────────────────────────────── */
+        .stats-bar {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.75rem;
+            font-size: 0.78rem;
+            color: var(--txt-secondary);
+            flex-wrap: wrap;
+        }
+
+        .stat-item { display: flex; gap: 0.4rem; align-items: center; }
+        .stat-val  { color: var(--txt-primary); font-weight: 500; }
+        .stat-dot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .dot-green  { background: var(--green);  box-shadow: 0 0 6px var(--green); }
+        .dot-yellow { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+        .dot-dim    { background: var(--txt-muted); }
+
+        /* ── TOOLBAR ────────────────────────────────────────────── */
+        .toolbar {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 480px;
+        }
+
+        .search-prefix {
+            position: absolute;
+            left: 0.75rem; top: 50%;
+            transform: translateY(-50%);
+            color: var(--green);
+            font-size: 0.85rem;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        #ledger-search {
+            width: 100%;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 0;
+            color: var(--txt-primary);
+            font-family: var(--pico-font-family);
+            font-size: 0.85rem;
+            padding: 0.45rem 0.75rem 0.45rem 5.2rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        #ledger-search:focus { border-color: var(--green); }
+        #ledger-search::placeholder { color: var(--txt-muted); }
+
+        .filter-wrap {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            color: var(--txt-secondary);
+            font-family: var(--pico-font-family);
+            font-size: 0.75rem;
+            padding: 0.35rem 0.65rem;
+            cursor: pointer;
+            border-radius: 0;
+            letter-spacing: 0.03em;
+            transition: all 0.12s;
+        }
+
+        .filter-btn:hover         { border-color: var(--txt-secondary); color: var(--txt-primary); }
+        .filter-btn.active        { border-color: var(--green); color: var(--green); }
+        .filter-btn[data-filter="Active Compute Node"].active { border-color: var(--green); color: var(--green); }
+        .filter-btn[data-filter="unallocated"].active         { border-color: var(--yellow); color: var(--yellow); }
+        .filter-btn[data-filter="Awaiting Triage"].active     { border-color: var(--red); color: var(--red); }
+
+        .result-count {
+            margin-left: auto;
+            font-size: 0.75rem;
+            color: var(--txt-muted);
+            white-space: nowrap;
+            align-self: center;
+        }
+
+        /* ── TABLE ──────────────────────────────────────────────── */
+        .ledger-wrap {
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        thead tr {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--txt-muted);
+            white-space: nowrap;
+            border-right: 1px solid var(--border-dim);
+        }
+
+        th:last-child { border-right: none; }
+
+        th .sort-indicator {
+            display: inline-block;
+            margin-left: 0.3rem;
+            opacity: 0.3;
+            font-size: 0.65rem;
+        }
+
+        th.sorted-asc  .sort-indicator,
+        th.sorted-desc .sort-indicator { opacity: 1; color: var(--green); }
+
+        th[data-sort] { cursor: pointer; user-select: none; }
+        th[data-sort]:hover { color: var(--txt-secondary); }
+
+        tbody tr {
+            background: var(--bg-row);
+            border-bottom: 1px solid var(--border-dim);
+            transition: background 0.1s;
+        }
+
+        tbody tr:hover      { background: var(--bg-hover); }
+        tbody tr.row-hidden { display: none; }
+
+        td {
+            padding: 0.5rem 0.75rem;
+            border-right: 1px solid var(--border-dim);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        td:last-child { border-right: none; }
+
+        td.td-id code {
+            font-size: 0.78rem;
+            color: var(--txt-code);
+            letter-spacing: 0.03em;
+        }
+
+        td.td-device a {
+            color: var(--txt-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        td.td-device a:hover { color: var(--green); }
+
+        td.td-arch {
+            color: var(--txt-secondary);
+            font-size: 0.78rem;
+        }
+
+        td.td-class {
+            color: var(--txt-secondary);
+            font-size: 0.78rem;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        td.td-donor {
+            color: var(--txt-secondary);
+            font-size: 0.78rem;
+        }
+
+        td.td-donor a {
+            color: var(--txt-secondary);
+            text-decoration: none;
+        }
+
+        td.td-donor a:hover { color: var(--blue); }
+
+        td.td-date {
+            color: var(--txt-muted);
+            font-size: 0.75rem;
+        }
+
+        /* ── STATUS BADGES ──────────────────────────────────────── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            padding: 0.15rem 0.45rem;
+            border-radius: 2px;
+            text-transform: uppercase;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .badge::before {
+            content: '';
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .badge-active {
+            color: var(--green);
+            background: rgba(74, 222, 128, 0.08);
+            border-color: rgba(74, 222, 128, 0.2);
+        }
+        .badge-active::before { background: var(--green); box-shadow: 0 0 5px var(--green); animation: pulse 2s infinite; }
+
+        .badge-unallocated {
+            color: var(--yellow);
+            background: rgba(250, 204, 21, 0.08);
+            border-color: rgba(250, 204, 21, 0.2);
+        }
+        .badge-unallocated::before { background: var(--yellow); }
+
+        .badge-triage {
+            color: var(--red);
+            background: rgba(248, 113, 113, 0.08);
+            border-color: rgba(248, 113, 113, 0.2);
+        }
+        .badge-triage::before { background: var(--red); }
+
+        .badge-default {
+            color: var(--txt-secondary);
+            background: rgba(100, 116, 139, 0.08);
+            border-color: rgba(100, 116, 139, 0.2);
+        }
+        .badge-default::before { background: var(--txt-secondary); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
+        }
+
+        /* ── EMPTY STATE ────────────────────────────────────────── */
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem;
+            color: var(--txt-muted);
+            font-size: 0.82rem;
+            display: none;
+        }
+
+        .empty-state code { color: var(--txt-secondary); }
+
+        /* ── FOOTER ─────────────────────────────────────────────── */
+        .site-footer {
+            margin-top: 1.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-dim);
+            font-size: 0.72rem;
+            color: var(--txt-muted);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* ── PICO OVERRIDE CLEANUP ──────────────────────────────── */
+        a         { color: inherit; }
+        input     { margin-bottom: 0; }
+        button    { margin-bottom: 0; }
+        h1,h2,h3  { margin: 0; }
     </style>
 </head>
 <body>
-    <main class="container">
-        <header>
-            <hgroup>
-                <h1><ins>WNH</ins> Hardware Ledger</h1>
-                <p>Intercepted e-waste inventory // Why Not Hardware Initiative</p>
-            </hgroup>
-        </header>
+<div class="shell">
 
-        <section class="search-container">
-            <input type="search" id="search-input" placeholder="Filter by name, class, donor, or architecture..." onkeyup="filterTable()">
-        </section>
+    <!-- HEADER -->
+    <header class="site-header">
+        <div class="header-top">
+            <a href="/" class="site-logo">WHY NOT HARDWARE</a>
+            <span class="site-tagline">// rescued e-waste · low-level systems · kernel lab</span>
+        </div>
+        <div class="stats-bar">
+            {{- $all   := where .Site.RegularPages "Section" "hardware" -}}
+            {{- $active := where $all ".Params.status" "Active Compute Node" -}}
+            {{- $unalloc := where $all ".Params.status" "unallocated" -}}
+            {{- $triage  := where $all ".Params.status" "Awaiting Triage" -}}
+            <div class="stat-item">
+                <span class="stat-dot dot-dim"></span>
+                TOTAL <span class="stat-val">{{ len $all }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-dot dot-green"></span>
+                ACTIVE <span class="stat-val">{{ len $active }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-dot dot-yellow"></span>
+                UNALLOCATED <span class="stat-val">{{ len $unalloc }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-dot" style="background:var(--red)"></span>
+                TRIAGE <span class="stat-val">{{ len $triage }}</span>
+            </div>
+            <div class="stat-item" style="margin-left:auto">
+                <span style="color:var(--txt-muted)">GENERATED</span>
+                <span class="stat-val">{{ now.Format "2006-01-02 15:04" }} UTC</span>
+            </div>
+        </div>
+    </header>
 
-        <figure>
-            <table role="grid" id="hardware-table">
-                <thead>
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Device</th>
-                        <th scope="col">Class</th>
-                        <th scope="col">Arch</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Donor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{ range where .Site.RegularPages "Section" "hardware" }}
-                    <tr>
-                        <td><code>{{ .Params.asset_id }}</code></td>
-                        <td><strong><a href="{{ .Permalink }}">{{ .Title }}</a></strong></td>
-                        <td>{{ .Params.class }}</td>
-                        <td><small>{{ .Params.architecture }}</small></td>
-                        <td><span class="status-badge">{{ .Params.status }}</span></td>
-                        <td><a href="{{ .Params.donor_link }}" class="secondary">{{ .Params.donor }}</a></td>
-                    </tr>
-                    {{ end }}
-                </tbody>
-            </table>
-        </figure>
-    </main>
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <div class="search-wrap">
+            <span class="search-prefix">grep -i</span>
+            <input
+                type="search"
+                id="ledger-search"
+                placeholder="filter rows…"
+                autocomplete="off"
+                spellcheck="false"
+                aria-label="Search hardware ledger"
+            >
+        </div>
+        <div class="filter-wrap" aria-label="Filter by status">
+            <button class="filter-btn active" data-filter="ALL">ALL</button>
+            <button class="filter-btn" data-filter="Active Compute Node">ACTIVE</button>
+            <button class="filter-btn" data-filter="unallocated">UNALLOC</button>
+            <button class="filter-btn" data-filter="Awaiting Triage">TRIAGE</button>
+        </div>
+        <span class="result-count" id="row-count" aria-live="polite"></span>
+    </div>
 
-    <script>
-    function filterTable() {
-        const input = document.getElementById("search-input");
-        const filter = input.value.toUpperCase();
-        const table = document.getElementById("hardware-table");
-        const tr = table.getElementsByTagName("tr");
+    <!-- TABLE -->
+    <div class="ledger-wrap">
+        <table id="ledger-table" aria-label="Hardware Ledger">
+            <thead>
+                <tr>
+                    <th data-sort="id">ASSET ID <span class="sort-indicator">↕</span></th>
+                    <th data-sort="device">DEVICE <span class="sort-indicator">↕</span></th>
+                    <th data-sort="class">CLASS <span class="sort-indicator">↕</span></th>
+                    <th data-sort="arch">ARCHITECTURE <span class="sort-indicator">↕</span></th>
+                    <th data-sort="status">STATUS <span class="sort-indicator">↕</span></th>
+                    <th data-sort="donor">DONOR <span class="sort-indicator">↕</span></th>
+                    <th data-sort="date">LOGGED <span class="sort-indicator">↕</span></th>
+                </tr>
+            </thead>
+            <tbody id="ledger-body">
+                {{- $pages := where .Site.RegularPages "Section" "hardware" -}}
+                {{- range $pages.ByParam "asset_id" -}}
+                {{- $statusClass := "badge-default" -}}
+                {{- if eq .Params.status "Active Compute Node" -}}{{ $statusClass = "badge-active" }}{{- end -}}
+                {{- if eq .Params.status "unallocated" -}}{{ $statusClass = "badge-unallocated" }}{{- end -}}
+                {{- if eq .Params.status "Awaiting Triage" -}}{{ $statusClass = "badge-triage" }}{{- end -}}
+                <tr
+                    data-id="{{ .Params.asset_id | lower }}"
+                    data-device="{{ .Title | lower }}"
+                    data-class="{{ .Params.class | lower }}"
+                    data-arch="{{ .Params.architecture | lower }}"
+                    data-status="{{ .Params.status | lower }}"
+                    data-donor="{{ .Params.donor | lower }}"
+                    data-date="{{ .Date.Format "2006-01-02" }}"
+                >
+                    <td class="td-id"><code>{{ .Params.asset_id }}</code></td>
+                    <td class="td-device"><a href="{{ .Permalink }}">{{ .Title }}</a></td>
+                    <td class="td-class">{{ .Params.class }}</td>
+                    <td class="td-arch">{{ .Params.architecture }}</td>
+                    <td class="td-status">
+                        <span class="badge {{ $statusClass }}">{{ .Params.status }}</span>
+                    </td>
+                    <td class="td-donor">
+                        {{- if .Params.donor_link -}}
+                        <a href="{{ .Params.donor_link }}" target="_blank" rel="noopener">{{ .Params.donor }}</a>
+                        {{- else -}}
+                        {{ .Params.donor }}
+                        {{- end -}}
+                    </td>
+                    <td class="td-date">{{ .Date.Format "2006-01-02" }}</td>
+                </tr>
+                {{- end }}
+            </tbody>
+        </table>
+        <div class="empty-state" id="empty-state">
+            <div>no results for <code id="empty-query"></code></div>
+            <div style="margin-top:0.35rem;font-size:0.72rem">try a different search term or clear the filter</div>
+        </div>
+    </div>
 
-        for (let i = 1; i < tr.length; i++) {
-            let rowText = tr[i].textContent || tr[i].innerText;
-            if (rowText.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-            }
-        }
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <span>WHY NOT HARDWARE // e-waste rescue ledger</span>
+        <span>{{ len (where .Site.RegularPages "Section" "hardware") }} device(s) cataloged</span>
+    </footer>
+
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    const searchInput  = document.getElementById('ledger-search');
+    const filterBtns   = document.querySelectorAll('.filter-btn');
+    const rows         = Array.from(document.querySelectorAll('#ledger-body tr'));
+    const rowCount     = document.getElementById('row-count');
+    const emptyState   = document.getElementById('empty-state');
+    const emptyQuery   = document.getElementById('empty-query');
+    const headers      = document.querySelectorAll('th[data-sort]');
+
+    let activeFilter  = 'ALL';
+    let sortKey       = null;
+    let sortDir       = 'asc';
+
+    /* ── FILTER ENGINE ──────────────────────────────────────── */
+    function applyFilters() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visible = 0;
+
+        rows.forEach(row => {
+            const searchFields = [
+                row.dataset.id,
+                row.dataset.device,
+                row.dataset.arch,
+                row.dataset.class,
+                row.dataset.donor
+            ].join(' ');
+
+            const matchesSearch = !query || searchFields.includes(query);
+            const matchesFilter = activeFilter === 'ALL' ||
+                row.dataset.status === activeFilter.toLowerCase();
+
+            const show = matchesSearch && matchesFilter;
+            row.classList.toggle('row-hidden', !show);
+            if (show) visible++;
+        });
+
+        const total = rows.length;
+        rowCount.textContent = `${visible}/${total} device(s)`;
+
+        const isEmpty = visible === 0;
+        emptyState.style.display = isEmpty ? 'block' : 'none';
+        if (isEmpty) emptyQuery.textContent = query || activeFilter;
     }
-    </script>
+
+    /* ── SORT ENGINE ────────────────────────────────────────── */
+    function sortTable(key) {
+        if (sortKey === key) {
+            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortKey = key;
+            sortDir = 'asc';
+        }
+
+        headers.forEach(h => {
+            const ind = h.querySelector('.sort-indicator');
+            h.classList.remove('sorted-asc', 'sorted-desc');
+            ind.textContent = '↕';
+            if (h.dataset.sort === sortKey) {
+                h.classList.add(sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+                ind.textContent = sortDir === 'asc' ? '↑' : '↓';
+            }
+        });
+
+        const tbody = document.getElementById('ledger-body');
+        const sorted = [...rows].sort((a, b) => {
+            const av = a.dataset[key] || '';
+            const bv = b.dataset[key] || '';
+            return sortDir === 'asc'
+                ? av.localeCompare(bv, undefined, { numeric: true })
+                : bv.localeCompare(av, undefined, { numeric: true });
+        });
+        sorted.forEach(r => tbody.appendChild(r));
+        applyFilters();
+    }
+
+    /* ── EVENT BINDINGS ─────────────────────────────────────── */
+    searchInput.addEventListener('input', applyFilters);
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter;
+            applyFilters();
+        });
+    });
+
+    headers.forEach(h => {
+        h.addEventListener('click', () => sortTable(h.dataset.sort));
+    });
+
+    /* ── KEYBOARD SHORTCUT: / to focus search ───────────────── */
+    document.addEventListener('keydown', e => {
+        if (e.key === '/' && document.activeElement !== searchInput) {
+            e.preventDefault();
+            searchInput.focus();
+        }
+        if (e.key === 'Escape') {
+            searchInput.value = '';
+            applyFilters();
+            searchInput.blur();
+        }
+    });
+
+    /* ── INIT ───────────────────────────────────────────────── */
+    applyFilters();
+})();
+</script>
 </body>
 </html>

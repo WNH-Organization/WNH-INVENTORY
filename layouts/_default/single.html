@@ -2,140 +2,726 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ .Title }} // WNH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <style>
-        /* 1. Global Shrink & Compact Spacing */
-        :root { 
-            --pico-font-family: 'Fira Code', monospace; 
-            --pico-primary: #4ade80; 
-            --pico-spacing: 0.5rem; 
-            --pico-typography-spacing-vertical: 0.5rem;
-        }
-        body { font-size: 14px; line-height: 1.4; background: #0d1117; }
-        
-        /* 2. Tight Terminal Box */
-        .terminal-box { 
-            border: 1px solid #30363d; 
-            background: #161b22; 
-            padding: 1rem; 
-            margin-top: 1rem;
+        /* ── TOKENS ─────────────────────────────────────────────── */
+        :root {
+            --pico-font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            --pico-primary:     #4ade80;
+            --pico-spacing:     0.4rem;
+            --pico-typography-spacing-vertical: 0.4rem;
+
+            --bg-base:    #09090b;
+            --bg-panel:   #0f1117;
+            --bg-inner:   #0c1016;
+            --bg-hover:   #161b24;
+            --border:     #1e2533;
+            --border-dim: #161b22;
+            --border-acc: #4ade8033;
+
+            --txt-primary:   #e2e8f0;
+            --txt-secondary: #64748b;
+            --txt-muted:     #334155;
+            --txt-code:      #94a3b8;
+
+            --green:  #4ade80;
+            --yellow: #facc15;
+            --red:    #f87171;
+            --blue:   #60a5fa;
+            --purple: #a78bfa;
+            --cyan:   #22d3ee;
         }
 
-        /* 3. Smaller Headers & Data Rows */
-        h1 { font-size: 1.4rem; margin-bottom: 0; }
-        h3 { font-size: 1rem; text-transform: uppercase; color: #8b949e; border-bottom: 1px dashed #30363d; padding-bottom: 0.2rem; margin-top: 1rem; margin-bottom: 0.5rem; }
-        .meta-row { font-size: 0.85rem; color: #8b949e; margin-bottom: 1rem; display: flex; gap: 1rem; flex-wrap: wrap; }
-        .meta-row strong { color: #c9d1d9; }
-        
-        /* 4. Compact Logs */
-        .log-entry { font-size: 0.9rem; border-left: 2px solid var(--pico-primary); padding-left: 0.5rem; margin-bottom: 0.4rem; }
-        
-        /* 5. Smaller, Tighter Photos */
-        .photo-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-        .photo-grid img { height: 120px; width: auto; max-width: 200px; object-fit: cover; border: 1px solid #30363d; border-radius: 4px; opacity: 0.8; transition: opacity 0.2s; cursor: zoom-in; }
-        .photo-grid img:hover { opacity: 1; }
-        
-        nav { font-size: 0.9rem; margin-top: 1rem; }
-        hr { border-color: #30363d; margin: 1rem 0; }
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html, body {
+            margin: 0; padding: 0;
+            background: var(--bg-base);
+            color: var(--txt-primary);
+            font-family: var(--pico-font-family);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        /* ── SCANLINE ───────────────────────────────────────────── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px
+            );
+            pointer-events: none; z-index: 9999;
+        }
+
+        /* ── LAYOUT ─────────────────────────────────────────────── */
+        .shell {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* ── BREADCRUMB NAV ─────────────────────────────────────── */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.78rem;
+            color: var(--txt-muted);
+        }
+
+        .top-nav a {
+            color: var(--txt-secondary);
+            text-decoration: none;
+            transition: color 0.12s;
+        }
+
+        .top-nav a:hover { color: var(--green); }
+        .top-nav .sep    { color: var(--txt-muted); }
+        .top-nav .cur    { color: var(--txt-primary); }
+
+        /* ── MAIN PANEL ─────────────────────────────────────────── */
+        .device-panel {
+            border: 1px solid var(--border);
+            background: var(--bg-panel);
+        }
+
+        /* ── PANEL HEADER ───────────────────────────────────────── */
+        .panel-header {
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.25rem 0.85rem;
+            background: var(--bg-inner);
+        }
+
+        .panel-titlebar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .panel-dots {
+            display: flex;
+            gap: 0.35rem;
+            flex-shrink: 0;
+        }
+
+        .panel-dots span {
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-r { background: #f87171; }
+        .dot-y { background: #facc15; }
+        .dot-g { background: #4ade80; }
+
+        .panel-title-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--txt-primary);
+            letter-spacing: 0.02em;
+        }
+
+        .panel-title-text::before {
+            content: '# ';
+            color: var(--txt-muted);
+            font-weight: 300;
+        }
+
+        /* ── META ROW ───────────────────────────────────────────── */
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem 1.5rem;
+            font-size: 0.78rem;
+            color: var(--txt-secondary);
+        }
+
+        .meta-item { display: flex; gap: 0.3rem; align-items: center; }
+        .meta-key  { color: var(--txt-muted); }
+        .meta-val  { color: var(--txt-primary); }
+        .meta-val a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+        .meta-val a:hover { text-decoration: underline; }
+
+        code.asset-id {
+            font-size: 0.78rem;
+            color: var(--cyan);
+            background: rgba(34, 211, 238, 0.08);
+            padding: 0.05rem 0.3rem;
+            border: 1px solid rgba(34, 211, 238, 0.15);
+        }
+
+        /* ── STATUS BADGES ──────────────────────────────────────── */
+        .badge {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            font-size: 0.68rem; font-weight: 500;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            padding: 0.12rem 0.4rem;
+            border: 1px solid transparent;
+        }
+
+        .badge::before {
+            content: ''; width: 5px; height: 5px;
+            border-radius: 50%; flex-shrink: 0;
+        }
+
+        .badge-active      { color: var(--green);  background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.25); }
+        .badge-active::before { background: var(--green); box-shadow: 0 0 5px var(--green); animation: pulse 2s infinite; }
+        .badge-unallocated { color: var(--yellow); background: rgba(250,204,21,0.08);  border-color: rgba(250,204,21,0.25); }
+        .badge-unallocated::before { background: var(--yellow); }
+        .badge-triage      { color: var(--red);    background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.25); }
+        .badge-triage::before { background: var(--red); }
+        .badge-default     { color: var(--txt-secondary); background: rgba(100,116,139,0.08); border-color: rgba(100,116,139,0.25); }
+        .badge-default::before { background: var(--txt-secondary); }
+
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+        /* ── SECTION BLOCKS ─────────────────────────────────────── */
+        .section-block {
+            border-bottom: 1px solid var(--border-dim);
+            padding: 1rem 1.25rem;
+        }
+
+        .section-block:last-child { border-bottom: none; }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--txt-muted);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-label::before { content: '//'; color: var(--green); }
+        .section-label::after  { content: ''; flex: 1; height: 1px; background: var(--border-dim); }
+
+        /* ── PHOTO GRID ─────────────────────────────────────────── */
+        .photo-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .photo-thumb {
+            position: relative;
+            cursor: zoom-in;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: border-color 0.15s, transform 0.15s;
+        }
+
+        .photo-thumb:hover {
+            border-color: var(--green);
+            transform: translateY(-1px);
+        }
+
+        .photo-thumb img {
+            display: block;
+            height: 110px;
+            width: auto;
+            max-width: 190px;
+            object-fit: cover;
+            opacity: 0.82;
+            transition: opacity 0.15s;
+        }
+
+        .photo-thumb:hover img { opacity: 1; }
+
+        .photo-thumb .zoom-icon {
+            position: absolute; bottom: 4px; right: 4px;
+            font-size: 0.65rem;
+            color: var(--green);
+            background: rgba(0,0,0,0.7);
+            padding: 0.1rem 0.25rem;
+            opacity: 0;
+            transition: opacity 0.15s;
+            pointer-events: none;
+        }
+
+        .photo-thumb:hover .zoom-icon { opacity: 1; }
+
+        /* ── PROGRESS LOG ───────────────────────────────────────── */
+        .log-timeline { display: flex; flex-direction: column; gap: 0; }
+
+        .log-entry {
+            display: grid;
+            grid-template-columns: 8.5rem 1fr;
+            gap: 0 0.75rem;
+            padding: 0.35rem 0;
+            border-bottom: 1px solid var(--border-dim);
+            font-size: 0.82rem;
+            position: relative;
+        }
+
+        .log-entry:last-child { border-bottom: none; }
+
+        .log-entry::before {
+            content: '';
+            position: absolute;
+            left: 8.5rem;
+            top: 0; bottom: 0;
+            width: 1px;
+            background: var(--border);
+        }
+
+        .log-date {
+            color: var(--txt-muted);
+            font-size: 0.75rem;
+            padding-right: 0.75rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: flex-start;
+            padding-top: 0.1rem;
+            gap: 0.4rem;
+        }
+
+        .log-date::after {
+            content: '●';
+            font-size: 0.45rem;
+            color: var(--green);
+            align-self: center;
+            flex-shrink: 0;
+        }
+
+        .log-note {
+            color: var(--txt-primary);
+            padding-left: 0.75rem;
+        }
+
+        /* ── MARKDOWN CONTENT ───────────────────────────────────── */
+        .content-area {
+            font-size: 0.85rem;
+            color: var(--txt-secondary);
+            line-height: 1.7;
+        }
+
+        .content-area h1, .content-area h2 {
+            font-size: 0.88rem;
+            color: var(--txt-primary);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 0.3rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .content-area h3 {
+            font-size: 0.82rem;
+            color: var(--txt-secondary);
+            margin: 0.75rem 0 0.3rem;
+        }
+
+        .content-area p { margin: 0.4rem 0; }
+
+        .content-area code {
+            font-size: 0.8rem;
+            background: rgba(148, 163, 184, 0.08);
+            border: 1px solid var(--border);
+            padding: 0.05rem 0.3rem;
+            color: var(--cyan);
+        }
+
+        .content-area pre {
+            background: var(--bg-inner);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+        }
+
+        .content-area pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: var(--txt-primary);
+            font-size: 0.8rem;
+        }
+
+        .content-area a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        .content-area a:hover { text-decoration: underline; }
+
+        .content-area ul, .content-area ol {
+            padding-left: 1.25rem;
+            margin: 0.4rem 0;
+        }
+
+        .content-area li { margin-bottom: 0.2rem; }
+
+        /* ── SPEC TABLE ─────────────────────────────────────────── */
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .spec-table tr { border-bottom: 1px solid var(--border-dim); }
+        .spec-table tr:last-child { border-bottom: none; }
+
+        .spec-table th {
+            text-align: left;
+            font-weight: 400;
+            color: var(--txt-muted);
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0.3rem 0;
+            width: 9rem;
+            vertical-align: top;
+        }
+
+        .spec-table td {
+            color: var(--txt-primary);
+            padding: 0.3rem 0;
+            vertical-align: top;
+        }
+
+        /* ── LIGHTBOX ───────────────────────────────────────────── */
+        #lightbox {
+            padding: 0;
+            background: transparent;
+            border: none;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+
+        #lightbox::backdrop {
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(4px);
+        }
+
+        .lightbox-inner {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .lightbox-toolbar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            color: var(--txt-secondary);
+        }
+
+        .lb-close-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--txt-secondary);
+            font-family: var(--pico-font-family);
+            font-size: 0.72rem;
+            padding: 0.25rem 0.6rem;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            transition: all 0.12s;
+        }
+
+        .lb-close-btn:hover { border-color: var(--red); color: var(--red); }
+
+        #lightbox-img {
+            max-height: 85vh;
+            max-width: 92vw;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            cursor: zoom-out;
+            display: block;
+        }
+
+        /* ── FOOTER ─────────────────────────────────────────────── */
+        .page-footer {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-dim);
+            font-size: 0.72rem;
+            color: var(--txt-muted);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* ── PICO CLEANUP ───────────────────────────────────────── */
+        a { color: inherit; }
+        h1,h2,h3,h4 { margin: 0; }
+        button { margin-bottom: 0; }
+        dialog article { padding: 0; }
     </style>
 </head>
 <body>
-    <main class="container">
-        <nav><a href="/" class="secondary">← Back to Ledger</a></nav>
+<div class="shell">
 
-        <div class="terminal-box">
-            <header>
-                <h1>{{ .Title }}</h1>
-                <div class="meta-row">
-                    <span><strong>ID:</strong> <code>{{ .Params.asset_id }}</code></span>
-                    <span><strong>Status:</strong> <ins>{{ .Params.status }}</ins></span>
-                    <span><strong>Arch:</strong> {{ .Params.architecture }}</span>
-                    <span><strong>Class:</strong> {{ .Params.class }}</span>
-                    <span><strong>Donor:</strong> <a href="{{ .Params.donor_link }}">{{ .Params.donor }}</a></span>
+    <!-- BREADCRUMB -->
+    <nav class="top-nav" aria-label="Breadcrumb">
+        <a href="/">WHY NOT HARDWARE</a>
+        <span class="sep">/</span>
+        <a href="/hardware/">hardware</a>
+        <span class="sep">/</span>
+        <span class="cur">{{ .Params.asset_id }}</span>
+    </nav>
+
+    <!-- MAIN PANEL -->
+    <div class="device-panel">
+
+        <!-- PANEL HEADER -->
+        <header class="panel-header">
+            <div class="panel-titlebar">
+                <div class="panel-dots">
+                    <span class="dot-r"></span>
+                    <span class="dot-y"></span>
+                    <span class="dot-g"></span>
                 </div>
-            </header>
-
-            {{ $initial := .Resources.Match "initial/*" }}
-            {{ if $initial }}
-            <section>
-                <h3>[ Initial State ]</h3>
-                <div class="photo-grid">
-                    {{ range $initial }}
-                        {{ $opt := .Fit "400x300 q85" }}
-                        <img src="{{ $opt.RelPermalink }}" 
-                             onclick="openLightbox('{{ .RelPermalink }}')" 
-                             alt="Initial Hardware State">
-                    {{ end }}
+                <h1 class="panel-title-text">{{ .Title }}</h1>
+            </div>
+            <div class="meta-row">
+                <div class="meta-item">
+                    <span class="meta-key">id:</span>
+                    <span class="meta-val"><code class="asset-id">{{ .Params.asset_id }}</code></span>
                 </div>
-            </section>
-            {{ end }}
-
-            <section>
-                <h3>[ Progress Log ]</h3>
-                {{ if .Params.updates }}
-                    {{ range .Params.updates }}
-                    <div class="log-entry">
-                        <code>{{ .date }}</code>: {{ .note }}
-                    </div>
-                    {{ end }}
-                {{ else }}
-                    <div class="log-entry" style="border-color: #8b949e; color: #8b949e;">No updates registered.</div>
+                <div class="meta-item">
+                    <span class="meta-key">status:</span>
+                    <span class="meta-val">
+                        {{- $sc := "badge-default" -}}
+                        {{- if eq .Params.status "Active Compute Node" -}}{{ $sc = "badge-active" }}{{- end -}}
+                        {{- if eq .Params.status "unallocated" -}}{{ $sc = "badge-unallocated" }}{{- end -}}
+                        {{- if eq .Params.status "Awaiting Triage" -}}{{ $sc = "badge-triage" }}{{- end -}}
+                        <span class="badge {{ $sc }}">{{ .Params.status }}</span>
+                    </span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-key">arch:</span>
+                    <span class="meta-val">{{ .Params.architecture }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-key">class:</span>
+                    <span class="meta-val">{{ .Params.class }}</span>
+                </div>
+                {{ if .Params.ram }}
+                <div class="meta-item">
+                    <span class="meta-key">ram:</span>
+                    <span class="meta-val">{{ .Params.ram }}</span>
+                </div>
                 {{ end }}
-            </section>
-
-            {{ $current := .Resources.Match "current/*" }}
-            {{ if $current }}
-            <section>
-                <h3>[ Current Build ]</h3>
-                <div class="photo-grid">
-                    {{ range $current }}
-                        {{ $opt := .Fit "400x300 q85" }}
-                        <img src="{{ $opt.RelPermalink }}" 
-                             onclick="openLightbox('{{ .RelPermalink }}')" 
-                             alt="Current Hardware State">
-                    {{ end }}
+                <div class="meta-item">
+                    <span class="meta-key">donor:</span>
+                    <span class="meta-val">
+                        {{- if .Params.donor_link -}}
+                        <a href="{{ .Params.donor_link }}" target="_blank" rel="noopener">{{ .Params.donor }}</a>
+                        {{- else -}}
+                        {{ .Params.donor }}
+                        {{- end -}}
+                    </span>
                 </div>
-            </section>
-            {{ end }}
-
-            {{ if .Content }}
-            <section>
-                <h3>[ Notes ]</h3>
-                <div style="font-size: 0.95rem;">
-                    {{ .Content }}
+                <div class="meta-item" style="margin-left:auto">
+                    <span class="meta-key">logged:</span>
+                    <span class="meta-val">{{ .Date.Format "2006-01-02" }}</span>
                 </div>
-            </section>
-            {{ end }}
+            </div>
+        </header>
+
+        <!-- SPEC TABLE (always shown) -->
+        <div class="section-block">
+            <div class="section-label">Hardware Specs</div>
+            <table class="spec-table">
+                <tr>
+                    <th>Asset ID</th>
+                    <td><code class="asset-id">{{ .Params.asset_id }}</code></td>
+                </tr>
+                <tr>
+                    <th>Architecture</th>
+                    <td>{{ .Params.architecture }}</td>
+                </tr>
+                {{ if .Params.ram }}
+                <tr>
+                    <th>RAM</th>
+                    <td>{{ .Params.ram }}</td>
+                </tr>
+                {{ end }}
+                <tr>
+                    <th>Class</th>
+                    <td>{{ .Params.class }}</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td>{{ .Params.status }}</td>
+                </tr>
+                <tr>
+                    <th>Donor</th>
+                    <td>
+                        {{- if .Params.donor_link -}}
+                        <a href="{{ .Params.donor_link }}" target="_blank" rel="noopener">{{ .Params.donor }}</a>
+                        {{- else -}}
+                        {{ .Params.donor }}
+                        {{- end -}}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Date Logged</th>
+                    <td>{{ .Date.Format "2006-01-02 15:04 MST" }}</td>
+                </tr>
+            </table>
         </div>
 
-        <dialog id="lightbox">
-            <article style="background: transparent; border: none; box-shadow: none; max-width: 95vw; display: flex; flex-direction: column; align-items: center;">
-                <a href="#close" aria-label="Close" class="close" onclick="closeLightbox(event)" style="align-self: flex-end; margin-bottom: 1rem;"></a>
-                <img id="lightbox-img" src="" style="max-height: 80vh; border-radius: 8px; border: 1px solid #30363d; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: zoom-out;" onclick="closeLightbox(event)">
-            </article>
-        </dialog>
-    </main>
+        <!-- INITIAL STATE PHOTOS -->
+        {{- $initial := .Resources.Match "initial/*" -}}
+        {{- if $initial }}
+        <div class="section-block">
+            <div class="section-label">Initial State</div>
+            <div class="photo-grid" id="photo-grid-initial">
+                {{- range $initial -}}
+                {{- $thumb := .Fit "400x300 q85" -}}
+                <div class="photo-thumb"
+                     onclick="openLightbox('{{ .RelPermalink }}', '{{ $.Title }} — Initial State')"
+                     role="button"
+                     tabindex="0"
+                     aria-label="View full-size: {{ .Name }}"
+                     onkeydown="if(event.key==='Enter'||event.key===' ')openLightbox('{{ .RelPermalink }}','{{ $.Title }} — Initial State')">
+                    <img src="{{ $thumb.RelPermalink }}"
+                         width="{{ $thumb.Width }}"
+                         height="{{ $thumb.Height }}"
+                         alt="Initial hardware state: {{ .Name }}"
+                         loading="lazy">
+                    <span class="zoom-icon">⊕ zoom</span>
+                </div>
+                {{- end }}
+            </div>
+        </div>
+        {{- end }}
 
-    <script>
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
+        <!-- PROGRESS LOG -->
+        <div class="section-block">
+            <div class="section-label">Progress Log</div>
+            <div class="log-timeline">
+                {{- if .Params.updates -}}
+                    {{- range .Params.updates }}
+                    <div class="log-entry">
+                        <div class="log-date">{{ .date }}</div>
+                        <div class="log-note">{{ .note }}</div>
+                    </div>
+                    {{- end -}}
+                {{- else }}
+                <div class="log-entry">
+                    <div class="log-date" style="color:var(--txt-muted)">—</div>
+                    <div class="log-note" style="color:var(--txt-muted)">No updates registered.</div>
+                </div>
+                {{- end }}
+            </div>
+        </div>
 
-        function openLightbox(highResUrl) {
-            lightboxImg.src = highResUrl;
-            lightbox.showModal();
-        }
+        <!-- CURRENT BUILD PHOTOS -->
+        {{- $current := .Resources.Match "current/*" -}}
+        {{- if $current }}
+        <div class="section-block">
+            <div class="section-label">Current Build</div>
+            <div class="photo-grid" id="photo-grid-current">
+                {{- range $current -}}
+                {{- $thumb := .Fit "400x300 q85" -}}
+                <div class="photo-thumb"
+                     onclick="openLightbox('{{ .RelPermalink }}', '{{ $.Title }} — Current Build')"
+                     role="button"
+                     tabindex="0"
+                     aria-label="View full-size: {{ .Name }}"
+                     onkeydown="if(event.key==='Enter'||event.key===' ')openLightbox('{{ .RelPermalink }}','{{ $.Title }} — Current Build')">
+                    <img src="{{ $thumb.RelPermalink }}"
+                         width="{{ $thumb.Width }}"
+                         height="{{ $thumb.Height }}"
+                         alt="Current build: {{ .Name }}"
+                         loading="lazy">
+                    <span class="zoom-icon">⊕ zoom</span>
+                </div>
+                {{- end }}
+            </div>
+        </div>
+        {{- end }}
 
-        function closeLightbox(event) {
-            event.preventDefault();
-            lightbox.close();
-        }
+        <!-- MARKDOWN CONTENT NOTES -->
+        {{- if .Content }}
+        <div class="section-block">
+            <div class="section-label">Notes</div>
+            <div class="content-area">
+                {{ .Content }}
+            </div>
+        </div>
+        {{- end }}
 
-        lightbox.addEventListener('click', function(event) {
-            if (event.target === lightbox) {
-                lightbox.close();
-            }
-        });
-    </script>
+    </div><!-- /.device-panel -->
+
+    <!-- FOOTER -->
+    <footer class="page-footer">
+        <a href="/" style="color:var(--txt-secondary);text-decoration:none">← back to ledger</a>
+        <span>last mod: {{ .Lastmod.Format "2006-01-02" }}</span>
+    </footer>
+
+</div><!-- /.shell -->
+
+<!-- LIGHTBOX DIALOG -->
+<dialog id="lightbox" aria-label="Image lightbox" aria-modal="true">
+    <div class="lightbox-inner">
+        <div class="lightbox-toolbar">
+            <span id="lightbox-caption" style="font-size:0.75rem;color:var(--txt-muted)"></span>
+            <button class="lb-close-btn" id="lb-close-btn" aria-label="Close lightbox">[ ESC ] CLOSE</button>
+        </div>
+        <img id="lightbox-img" src="" alt="Full-size hardware photo">
+    </div>
+</dialog>
+
+<script>
+(function () {
+    'use strict';
+
+    const dialog    = document.getElementById('lightbox');
+    const lbImg     = document.getElementById('lightbox-img');
+    const lbCaption = document.getElementById('lightbox-caption');
+    const lbClose   = document.getElementById('lb-close-btn');
+
+    function openLightbox(src, caption) {
+        lbImg.src          = src;
+        lbCaption.textContent = caption || '';
+        dialog.showModal();
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        dialog.close();
+        lbImg.src = '';
+        document.body.style.overflow = '';
+    }
+
+    /* expose to inline onclick handlers in Hugo template */
+    window.openLightbox = openLightbox;
+
+    lbClose.addEventListener('click', closeLightbox);
+    lbImg.addEventListener('click', closeLightbox);
+
+    /* click on backdrop (the <dialog> element itself) */
+    dialog.addEventListener('click', function (e) {
+        if (e.target === dialog) closeLightbox();
+    });
+
+    /* keyboard: ESC natively closes dialog, but we also clear src */
+    dialog.addEventListener('close', function () {
+        lbImg.src = '';
+        document.body.style.overflow = '';
+    });
+})();
+</script>
 </body>
 </html>

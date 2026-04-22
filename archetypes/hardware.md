@@ -14,7 +14,9 @@ updates:
 ---
 
 ## Technical Overview
+
 [Provide a brief description of the hardware state and the intended project.]
 
 ## Rescue Log
-[Add detailed notes here...]
+
+[Add detailed notes here about the device's condition, attempted repairs, and project goals.]
