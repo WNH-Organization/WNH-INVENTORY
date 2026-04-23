@@ -1,10 +1,12 @@
 ---
-title: "TITLE-TBD"
+title: "{{ replace .Name "-" " " | title }}"
 asset_id: "WNH-TBD"
 class: "CLASS-TBD"
 architecture: "TBD"
 ram: "TBD"
 status: "unallocated"
+hub: "1337 Benguerir"
+hub_link: "https://www.instagram.com/leetmakers/"
 donor: "DONOR-TBD"
 donor_link: ""
 operator: "TBD"

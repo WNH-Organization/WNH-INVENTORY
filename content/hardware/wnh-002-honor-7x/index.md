@@ -1,10 +1,12 @@
 ---
-title: "Honor X7"
+title: "Honor 7X"
 asset_id: "WNH-002"
 class: "smartphone"
 architecture: "TBD"
 ram: "TBD"
 status: "unallocated"
+hub: "1337 Benguerir"
+hub_link: "https://www.instagram.com/leetmakers/"
 donor: "Soukaina Nid Bella"
 donor_link: ""
 operator: "Taha Ed-dafili"

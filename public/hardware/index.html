@@ -1,61 +1,339 @@
 <!DOCTYPE html>
-<html>
-<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
-    <title>WNH Hardware Ledger</title>
-    </head>
+<html lang="en" data-theme="dark">
+<head><script src="/WNH-INVENTORY/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=WNH-INVENTORY/livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WNH // Hardware Inventory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Syne:wght@700;800;900&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        :root {
+            --pico-font-family: 'Fira Code', 'Cascadia Code', monospace;
+            --pico-primary: #4ade80;
+            --pico-spacing: 0.4rem;
+            --pico-typography-spacing-vertical: 0.4rem;
+            --bg-base:    #09090b;
+            --bg-panel:   #0d1117;
+            --bg-row:     #0d1016;
+            --bg-hover:   #141920;
+            --border:     #1e2533;
+            --border-dim: #13181f;
+            --txt-primary:   #dde4ed;
+            --txt-secondary: #5a6a80;
+            --txt-muted:     #2d3a4a;
+            --txt-2:         #4d6070;
+            --txt-3:         #233040;
+            --green:  #4ade80;
+            --yellow: #facc15;
+            --red:    #f87171;
+            --blue:   #60a5fa;
+            --cyan:   #22d3ee;
+            --orange: #fb923c;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; background: var(--bg-base); color: var(--txt-primary);
+            font-family: var(--pico-font-family); font-size: 13px; line-height: 1.5; }
+        body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); }
+        a { color: inherit; text-decoration: none; }
+        h1,h2,h3 { margin: 0; }
+        button, input { margin-bottom: 0; }
+
+         
+        .top-bar { display: flex; align-items: center; gap: 1.5rem; padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border); background: var(--bg-panel);
+            position: sticky; top: 0; z-index: 100; }
+        .logo { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800;
+            color: var(--green); letter-spacing: 0.06em; }
+        .logo .slash { color: var(--txt-3); font-weight: 300; margin: 0 0.2rem; }
+        .top-links { display: flex; gap: 1.25rem; font-size: 0.76rem; color: var(--txt-2); }
+        .top-links a:hover { color: var(--green); }
+        .top-right { margin-left: auto; }
+        .inventory-btn { display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.35);
+            color: var(--green); font-family: var(--pico-font-family); font-size: 0.75rem;
+            letter-spacing: 0.05em; padding: 0.38rem 0.85rem; cursor: pointer;
+            transition: all 0.15s; }
+        .inventory-btn:hover { background: rgba(74,222,128,0.18); border-color: var(--green); }
+        .inventory-btn::after { content: '→'; }
+
+        .shell { max-width: 1320px; margin: 0 auto; padding: 1.5rem; }
+
+         
+        .stats-bar { display: flex; gap: 2rem; margin-bottom: 1.25rem; font-size: 0.78rem;
+            color: var(--txt-secondary); flex-wrap: wrap; padding: 0.6rem 0.75rem;
+            background: var(--bg-panel); border: 1px solid var(--border); }
+        .stat-item { display: flex; align-items: center; gap: 0.45rem; }
+        .stat-val { color: var(--txt-primary); font-weight: 500; }
+        .stat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .dot-green  { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+        .dot-yellow { background: var(--yellow); }
+        .dot-red    { background: var(--red); }
+        .dot-dim    { background: var(--txt-muted); }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+         
+        .toolbar { display: flex; gap: 0.6rem; margin-bottom: 0.6rem; align-items: center; flex-wrap: wrap; }
+        .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 440px; }
+        .search-prefix { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%);
+            color: var(--green); font-size: 0.82rem; pointer-events: none; }
+        #inventory-search { width: 100%; background: var(--bg-panel); border: 1px solid var(--border);
+            border-radius: 0; color: var(--txt-primary); font-family: var(--pico-font-family);
+            font-size: 0.82rem; padding: 0.42rem 0.7rem 0.42rem 4.8rem; outline: none;
+            transition: border-color 0.15s; }
+        #inventory-search:focus { border-color: var(--green); }
+        #inventory-search::placeholder { color: var(--txt-muted); }
+        .filter-wrap { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+        .filter-btn { background: var(--bg-panel); border: 1px solid var(--border); color: var(--txt-secondary);
+            font-family: var(--pico-font-family); font-size: 0.72rem; padding: 0.32rem 0.6rem;
+            cursor: pointer; border-radius: 0; letter-spacing: 0.04em; transition: all 0.12s; }
+        .filter-btn:hover { border-color: var(--txt-secondary); color: var(--txt-primary); }
+        .filter-btn.active { border-color: var(--green); color: var(--green); }
+        .result-count { margin-left: auto; font-size: 0.72rem; color: var(--txt-muted); white-space: nowrap; }
+
+         
+        .inventory-wrap { border: 1px solid var(--border); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.81rem; }
+        thead tr { background: var(--bg-panel); border-bottom: 2px solid var(--border); }
+        th { padding: 0.48rem 0.7rem; text-align: left; font-weight: 500; font-size: 0.7rem;
+            letter-spacing: 0.09em; text-transform: uppercase; color: var(--txt-muted);
+            white-space: nowrap; border-right: 1px solid var(--border-dim); cursor: pointer;
+            user-select: none; transition: color 0.12s; }
+        th:last-child { border-right: none; }
+        th:hover { color: var(--txt-secondary); }
+        th .si { display: inline-block; margin-left: 0.25rem; opacity: 0.25; font-size: 0.62rem; }
+        th.sort-asc .si, th.sort-desc .si { opacity: 1; color: var(--green); }
+        tbody tr { background: var(--bg-row); border-bottom: 1px solid var(--border-dim); transition: background 0.1s; }
+        tbody tr:hover { background: var(--bg-hover); }
+        tbody tr.hidden { display: none; }
+        td { padding: 0.48rem 0.7rem; border-right: 1px solid var(--border-dim); vertical-align: middle; }
+        td:last-child { border-right: none; }
+
+         
+        .c-id code { font-size: 0.75rem; color: var(--cyan); letter-spacing: 0.03em; }
+        .c-device a { color: var(--txt-primary); font-weight: 500; }
+        .c-device a:hover { color: var(--green); }
+        .c-class, .c-donor { color: var(--txt-secondary); font-size: 0.78rem; }
+        .c-donor a { color: var(--txt-secondary); }
+        .c-donor a:hover { color: var(--blue); }
+        .c-date { color: var(--txt-muted); font-size: 0.73rem; white-space: nowrap; }
+        .c-hub { font-size: 0.78rem; }
+        .hub-chip { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem;
+            padding: 0.1rem 0.4rem; border: 1px solid rgba(34,211,238,0.2);
+            background: rgba(34,211,238,0.06); color: var(--cyan); white-space: nowrap; }
+        .hub-chip::before { content: '◈'; font-size: 0.55rem; }
+        .hub-chip a { color: inherit; }
+        .hub-chip a:hover { text-decoration: underline; }
+
+         
+        .badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.68rem;
+            font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
+            padding: 0.12rem 0.38rem; border: 1px solid transparent; white-space: nowrap; }
+        .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+        .badge-active      { color: var(--green);  background: rgba(74,222,128,0.07); border-color: rgba(74,222,128,0.22); }
+        .badge-active::before { background: var(--green); box-shadow: 0 0 5px var(--green); animation: pulse 2s infinite; }
+        .badge-unallocated { color: var(--yellow); background: rgba(250,204,21,0.07);  border-color: rgba(250,204,21,0.22); }
+        .badge-unallocated::before { background: var(--yellow); }
+        .badge-triage      { color: var(--red);    background: rgba(248,113,113,0.07); border-color: rgba(248,113,113,0.22); }
+        .badge-triage::before { background: var(--red); }
+        .badge-default     { color: var(--txt-secondary); background: rgba(100,116,139,0.07); border-color: rgba(100,116,139,0.22); }
+        .badge-default::before { background: var(--txt-secondary); }
+
+         
+        .empty-row td { text-align: center; padding: 2rem; color: var(--txt-muted); font-size: 0.82rem; }
+
+         
+        .site-footer { margin-top: 1rem; padding-top: 0.6rem; border-top: 1px solid var(--border-dim);
+            font-size: 0.72rem; color: var(--txt-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+    </style>
+</head>
 <body>
-    <h1>Why Not Hardware: Donation Ledger</h1>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>Asset ID</th>
-                <th>Device</th>
-                <th>Class</th>
-                <th>Architecture</th>
-                <th>Status</th>
-                <th>Donor</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-            <tr>
-                <td><code>WNH-004</code></td>
-                <td><a href="http://localhost:1313/hardware/wnh-004-daewoo-dpc-7900pd/">Daewoo Dpc 7900pd</a></td>
-                <td>portable DVD player</td>
-                <td>TBD</td>
-                <td>unallocated</td>
-                <td><a href="">Taha Ed-dafili</a></td>
-            </tr>
-            
-            <tr>
-                <td><code>WNH-003</code></td>
-                <td><a href="http://localhost:1313/hardware/wnh-003-casio-pocket-tv-1400/">Casio Pocket Tv 1400</a></td>
-                <td>TV</td>
-                <td>TBD</td>
-                <td>unallocated</td>
-                <td><a href="">Taha Ed-dafili</a></td>
-            </tr>
-            
-            <tr>
-                <td><code>WNH-002</code></td>
-                <td><a href="http://localhost:1313/hardware/wnh-002-honor-x7/">Honor X7</a></td>
-                <td>smartphone</td>
-                <td>TBD</td>
-                <td>unallocated</td>
-                <td><a href="">Soukaina Nid Bella</a></td>
-            </tr>
-            
-            <tr>
-                <td><code>WNH-001</code></td>
-                <td><a href="http://localhost:1313/hardware/wnh-001-tl-mr3020/">TP-Link TL-MR3020</a></td>
-                <td>Router / Central Hub</td>
-                <td>Atheros AR9331 (MIPS @ 400 MHz)</td>
-                <td>Active</td>
-                <td><a href="https://github.com/0rayn">Taha Ed-dafili</a></td>
-            </tr>
-            
-        </tbody>
-    </table>
+
+<header class="top-bar">
+    <a href="/WNH-INVENTORY/" class="logo">WHY NOT <span class="slash">/</span> HARDWARE</a>
+    <nav class="top-links">
+        <a href="/WNH-INVENTORY/">Home</a>
+        <a href="/WNH-INVENTORY/hardware/">Inventory</a>
+        <a href="/WNH-INVENTORY/#hubs">Hubs</a>
+        <a href="/WNH-INVENTORY/#about">About</a>
+    </nav>
+    <div class="top-right">
+        <a href="/WNH-INVENTORY/hardware/" class="inventory-btn">Open Inventory</a>
+    </div>
+</header>
+
+<div class="shell"><div class="stats-bar">
+        <div class="stat-item"><span class="stat-dot dot-dim"></span> TOTAL <span class="stat-val">4</span></div>
+        <div class="stat-item"><span class="stat-dot dot-green"></span> ACTIVE <span class="stat-val">1</span></div>
+        <div class="stat-item"><span class="stat-dot dot-yellow"></span> UNALLOCATED <span class="stat-val">3</span></div>
+        <div class="stat-item"><span class="stat-dot dot-red"></span> TRIAGE <span class="stat-val">0</span></div>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-wrap">
+            <span class="search-prefix">grep</span>
+            <input type="search" id="inventory-search" placeholder="filter devices…" autocomplete="off" spellcheck="false" aria-label="Search">
+        </div>
+        <div class="filter-wrap">
+            <button class="filter-btn active" data-filter="ALL">ALL</button>
+            <button class="filter-btn" data-filter="Active">ACTIVE</button>
+            <button class="filter-btn" data-filter="unallocated">UNALLOC</button>
+            <button class="filter-btn" data-filter="Awaiting Triage">TRIAGE</button>
+        </div>
+        <span class="result-count" id="row-count" aria-live="polite"></span>
+    </div>
+
+    <div class="inventory-wrap">
+        <table id="inventory-table">
+            <thead>
+                <tr>
+                    <th data-sort="id">ASSET ID <span class="si">↕</span></th>
+                    <th data-sort="device">DEVICE <span class="si">↕</span></th>
+                    <th data-sort="class">CLASS <span class="si">↕</span></th>
+                    <th data-sort="status">STATUS <span class="si">↕</span></th>
+                    <th data-sort="hub">HUB <span class="si">↕</span></th>
+                    <th data-sort="donor">DONOR <span class="si">↕</span></th>
+                    <th data-sort="date">LOGGED <span class="si">↕</span></th>
+                </tr>
+            </thead>
+            <tbody id="inventory-body"><tr data-id="wnh-001"
+                    data-device="tp-link tl-mr3020"
+                    data-class="router / central hub"
+                    data-status="active"
+                    data-hub="1337 benguerir"
+                    data-donor="taha ed-dafili"
+                    data-date="2026-04-21">
+                    <td class="c-id"><code>WNH-001</code></td>
+                    <td class="c-device"><a href="http://localhost:1313/WNH-INVENTORY/hardware/wnh-001-tl-mr3020/">TP-Link TL-MR3020</a></td>
+                    <td class="c-class">Router / Central Hub</td>
+                    <td class="c-status"><span class="badge badge-active">Active</span></td>
+                    <td class="c-hub">
+                        <span class="hub-chip"><a href="https://www.instagram.com/leetmakers/" target="_blank" rel="noopener">1337 Benguerir</a></span>
+                    </td>
+                    <td class="c-donor"><a href="https://github.com/0rayn" target="_blank" rel="noopener">Taha Ed-dafili</a></td>
+                    <td class="c-date">2026-04-21</td>
+                </tr><tr data-id="wnh-002"
+                    data-device="honor 7x"
+                    data-class="smartphone"
+                    data-status="unallocated"
+                    data-hub="1337 benguerir"
+                    data-donor="soukaina nid bella"
+                    data-date="2026-04-21">
+                    <td class="c-id"><code>WNH-002</code></td>
+                    <td class="c-device"><a href="http://localhost:1313/WNH-INVENTORY/hardware/wnh-002-honor-7x/">Honor 7X</a></td>
+                    <td class="c-class">smartphone</td>
+                    <td class="c-status"><span class="badge badge-unallocated">unallocated</span></td>
+                    <td class="c-hub">
+                        <span class="hub-chip"><a href="https://www.instagram.com/leetmakers/" target="_blank" rel="noopener">1337 Benguerir</a></span>
+                    </td>
+                    <td class="c-donor">Soukaina Nid Bella</td>
+                    <td class="c-date">2026-04-21</td>
+                </tr><tr data-id="wnh-003"
+                    data-device="casio pocket tv 1400"
+                    data-class="tv"
+                    data-status="unallocated"
+                    data-hub="1337 benguerir"
+                    data-donor="taha ed-dafili"
+                    data-date="2026-04-21">
+                    <td class="c-id"><code>WNH-003</code></td>
+                    <td class="c-device"><a href="http://localhost:1313/WNH-INVENTORY/hardware/wnh-003-casio-pocket-tv-1400/">Casio Pocket Tv 1400</a></td>
+                    <td class="c-class">TV</td>
+                    <td class="c-status"><span class="badge badge-unallocated">unallocated</span></td>
+                    <td class="c-hub">
+                        <span class="hub-chip"><a href="https://www.instagram.com/leetmakers/" target="_blank" rel="noopener">1337 Benguerir</a></span>
+                    </td>
+                    <td class="c-donor">Taha Ed-dafili</td>
+                    <td class="c-date">2026-04-21</td>
+                </tr><tr data-id="wnh-004"
+                    data-device="daewoo dpc 7900pd"
+                    data-class="portable dvd player"
+                    data-status="unallocated"
+                    data-hub="1337 benguerir"
+                    data-donor="taha ed-dafili"
+                    data-date="2026-04-21">
+                    <td class="c-id"><code>WNH-004</code></td>
+                    <td class="c-device"><a href="http://localhost:1313/WNH-INVENTORY/hardware/wnh-004-daewoo-dpc-7900pd/">Daewoo Dpc 7900pd</a></td>
+                    <td class="c-class">portable DVD player</td>
+                    <td class="c-status"><span class="badge badge-unallocated">unallocated</span></td>
+                    <td class="c-hub">
+                        <span class="hub-chip"><a href="https://www.instagram.com/leetmakers/" target="_blank" rel="noopener">1337 Benguerir</a></span>
+                    </td>
+                    <td class="c-donor">Taha Ed-dafili</td>
+                    <td class="c-date">2026-04-21</td>
+                </tr>
+                <tr class="empty-row" id="empty-row" style="display:none">
+                    <td colspan="7">no devices match the current filter</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="site-footer">
+        <a href="/" style="color:var(--txt-secondary)">← back to overview</a>
+        <span>4 device(s) cataloged across WNH network</span>
+    </footer>
+</div>
+
+<script>
+(function(){
+    'use strict';
+    const search   = document.getElementById('inventory-search');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const rows     = Array.from(document.querySelectorAll('#inventory-body tr:not(#empty-row)'));
+    const emptyRow = document.getElementById('empty-row');
+    const countEl  = document.getElementById('row-count');
+    const headers  = document.querySelectorAll('th[data-sort]');
+    let activeFilter = 'ALL', sortKey = null, sortDir = 'asc';
+
+    function filter() {
+        const q = search.value.trim().toLowerCase();
+        let n = 0;
+        rows.forEach(r => {
+            const haystack = [r.dataset.id, r.dataset.device, r.dataset.class, r.dataset.hub, r.dataset.donor].join(' ');
+            const matchQ = !q || haystack.includes(q);
+            const matchF = activeFilter === 'ALL' || r.dataset.status === activeFilter.toLowerCase();
+            const show = matchQ && matchF;
+            r.classList.toggle('hidden', !show);
+            if (show) n++;
+        });
+        countEl.textContent = n + '/' + rows.length + ' shown';
+        emptyRow.style.display = n === 0 ? '' : 'none';
+    }
+
+    function sort(key) {
+        sortDir = sortKey === key ? (sortDir === 'asc' ? 'desc' : 'asc') : 'asc';
+        sortKey = key;
+        headers.forEach(h => {
+            h.classList.remove('sort-asc','sort-desc');
+            h.querySelector('.si').textContent = '↕';
+            if (h.dataset.sort === key) {
+                h.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+                h.querySelector('.si').textContent = sortDir === 'asc' ? '↑' : '↓';
+            }
+        });
+        const tbody = document.getElementById('inventory-body');
+        [...rows].sort((a,b) => {
+            const av = a.dataset[key]||'', bv = b.dataset[key]||'';
+            return sortDir === 'asc' ? av.localeCompare(bv,undefined,{numeric:true}) : bv.localeCompare(av,undefined,{numeric:true});
+        }).forEach(r => tbody.insertBefore(r, emptyRow));
+        filter();
+    }
+
+    search.addEventListener('input', filter);
+    filterBtns.forEach(b => b.addEventListener('click', () => {
+        filterBtns.forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        activeFilter = b.dataset.filter;
+        filter();
+    }));
+    headers.forEach(h => h.addEventListener('click', () => sort(h.dataset.sort)));
+    document.addEventListener('keydown', e => {
+        if (e.key === '/' && document.activeElement !== search) { e.preventDefault(); search.focus(); }
+        if (e.key === 'Escape') { search.value = ''; filter(); search.blur(); }
+    });
+    filter();
+})();
+</script>
 </body>
 </html>

@@ -3,624 +3,547 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WNH // Hardware Inventory</title>
+    <title>Why Not Hardware // E-Waste Rescue Network</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Syne:wght@700;800;900&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
-        /* ── RESET & TOKENS ─────────────────────────────────────── */
+        /* ── TOKENS ─────────────────────────────────────────── */
         :root {
-            --pico-font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
-            --pico-primary:     #4ade80;
-            --pico-secondary:   #94a3b8;
-            --pico-spacing:     0.4rem;
-            --pico-typography-spacing-vertical: 0.4rem;
-
-            --bg-base:    #09090b;
-            --bg-panel:   #0f1117;
-            --bg-row:     #111318;
-            --bg-hover:   #161b24;
-            --border:     #1e2533;
-            --border-dim: #161b22;
-
-            --txt-primary:   #e2e8f0;
-            --txt-secondary: #64748b;
-            --txt-muted:     #334155;
-            --txt-code:      #94a3b8;
-
-            --green:   #4ade80;
-            --yellow:  #facc15;
-            --red:     #f87171;
-            --blue:    #60a5fa;
-            --purple:  #a78bfa;
-            --cyan:    #22d3ee;
-            --orange:  #fb923c;
+            --pico-font-family: 'Fira Code', monospace;
+            --pico-primary: #4ade80;
+            --pico-spacing: 0.4rem;
+            --bg:        #09090b;
+            --bg-panel:  #0d1117;
+            --bg-inner:  #0a0e14;
+            --border:    #1a2233;
+            --border-d:  #111820;
+            --txt:       #dde4ed;
+            --txt-2:     #4d6070;
+            --txt-3:     #233040;
+            --green:     #4ade80;
+            --yellow:    #facc15;
+            --red:       #f87171;
+            --blue:      #60a5fa;
+            --cyan:      #22d3ee;
         }
-
         *, *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; background: var(--bg); color: var(--txt);
+            font-family: var(--pico-font-family); font-size: 13px; line-height: 1.6; }
+        body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); }
+        a { color: inherit; text-decoration: none; }
+        h1,h2,h3,h4 { margin: 0; }
+        button { margin-bottom: 0; }
 
-        html, body {
-            margin: 0; padding: 0;
-            background: var(--bg-base);
-            color: var(--txt-primary);
-            font-family: var(--pico-font-family);
-            font-size: 13px;
-            line-height: 1.5;
+        /* ── SHELL ───────────────────────────────────────────── */
+        .shell { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+
+        /* ── TOP BAR ─────────────────────────────────────────── */
+        .top-bar { display: flex; align-items: center; gap: 1.5rem; padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border); background: var(--bg-panel);
+            position: sticky; top: 0; z-index: 100; }
+        .logo { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800;
+            color: var(--green); letter-spacing: 0.06em; }
+        .logo .slash { color: var(--txt-3); font-weight: 300; margin: 0 0.2rem; }
+        .top-links { display: flex; gap: 1.25rem; font-size: 0.76rem; color: var(--txt-2); }
+        .top-links a:hover { color: var(--green); }
+        .top-right { margin-left: auto; }
+        .inventory-btn { display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.35);
+            color: var(--green); font-family: var(--pico-font-family); font-size: 0.75rem;
+            letter-spacing: 0.05em; padding: 0.38rem 0.85rem; cursor: pointer;
+            transition: all 0.15s; }
+        .inventory-btn:hover { background: rgba(74,222,128,0.18); border-color: var(--green); }
+        .inventory-btn::after { content: '→'; }
+
+        /* ── HERO ────────────────────────────────────────────── */
+        .hero { padding: 5rem 0 3.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+        @media (max-width: 800px) { .hero { grid-template-columns: 1fr; padding: 3rem 0 2rem; } }
+
+        .hero-left {}
+        .hero-label { font-size: 0.7rem; letter-spacing: 0.14em; color: var(--txt-2); text-transform: uppercase; margin-bottom: 0.75rem; }
+        .hero-label::before { content: '$ '; color: var(--green); }
+        .hero-title { font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 900; line-height: 1.0; color: var(--txt); letter-spacing: -0.03em; margin-bottom: 1.25rem; }
+        .hero-title .accent { color: var(--green); }
+        .hero-desc { font-size: 0.88rem; color: var(--txt-2); line-height: 1.75; max-width: 480px; margin-bottom: 1.75rem; }
+        .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .btn-primary { display: inline-flex; align-items: center; gap: 0.5rem;
+            background: var(--green); color: #09090b; font-family: var(--pico-font-family);
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em;
+            padding: 0.6rem 1.2rem; transition: all 0.15s; }
+        .btn-primary:hover { background: #6ee7a0; }
+        .btn-primary::after { content: ' →'; }
+        .btn-ghost { display: inline-flex; align-items: center; gap: 0.5rem;
+            border: 1px solid var(--border); color: var(--txt-2); font-family: var(--pico-font-family);
+            font-size: 0.78rem; letter-spacing: 0.04em; padding: 0.58rem 1rem; transition: all 0.15s; }
+        .btn-ghost:hover { border-color: var(--txt-2); color: var(--txt); }
+
+        /* HERO STATS PANEL */
+        .hero-right {}
+        .stats-panel { background: var(--bg-panel); border: 1px solid var(--border); padding: 1.25rem; }
+        .stats-panel-head { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--txt-3); margin-bottom: 1rem; }
+        .stats-panel-head::before { content: '// '; color: var(--green); }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+        .stat-cell { background: var(--bg-inner); padding: 0.9rem 1rem; }
+        .stat-num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: 0.3rem; }
+        .stat-num-green  { color: var(--green); }
+        .stat-num-yellow { color: var(--yellow); }
+        .stat-num-red    { color: var(--red); }
+        .stat-num-cyan   { color: var(--cyan); }
+        .stat-lbl { font-size: 0.68rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--txt-2); }
+        .stat-sub { font-size: 0.65rem; color: var(--txt-3); margin-top: 0.15rem; }
+
+        /* ── SECTION DIVIDER ─────────────────────────────────── */
+        .sec-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+        .sec-label { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--txt-2); white-space: nowrap; }
+        .sec-label::before { content: '// '; color: var(--green); }
+        .sec-rule { flex: 1; height: 1px; background: var(--border); }
+
+        /* ── HUB MAP SECTION ─────────────────────────────────── */
+        .hub-section { margin: 3rem 0; }
+        .hub-layout { display: grid; grid-template-columns: 1fr 280px; gap: 1.25rem; align-items: start; }
+        @media (max-width: 800px) { .hub-layout { grid-template-columns: 1fr; } }
+
+        #hub-map { height: 420px; background: var(--bg-inner); border: 1px solid var(--border); z-index: 1; }
+
+        /* LEAFLET DARK OVERRIDES & FOCUS FIXES */
+        .leaflet-container { 
+            background: #0a0e14 !important; 
+            font-family: var(--pico-font-family); 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        /* AGGRESSIVE FOCUS RING REMOVAL */
+        .leaflet-container *:focus,
+        .leaflet-container:focus,
+        .leaflet-marker-icon:focus,
+        .leaflet-interactive:focus {
+            outline: none !important;
+            box-shadow: none !important;
         }
 
-        /* ── SCANLINE TEXTURE ───────────────────────────────────── */
-        body::before {
-            content: '';
-            position: fixed; inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0,0,0,0.04) 2px,
-                rgba(0,0,0,0.04) 4px
-            );
-            pointer-events: none;
-            z-index: 9999;
+        .leaflet-tile-pane { filter: brightness(0.9) saturate(0.85); }
+        .leaflet-popup-content-wrapper { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 0; box-shadow: 0 8px 32px rgba(0,0,0,0.6); color: var(--txt); font-family: var(--pico-font-family); font-size: 12px; }
+        .leaflet-popup-tip { background: var(--bg-panel); }
+        .leaflet-popup-close-button { color: var(--txt-2) !important; outline: none !important; }
+        .leaflet-popup-close-button:hover { color: var(--green) !important; }
+        
+        /* OVERRIDE: Fix zoom buttons centering */
+        .leaflet-control-zoom a { 
+            background: var(--bg-panel) !important; 
+            border-color: var(--border) !important; 
+            color: var(--txt-2) !important; 
+            display: flex !important; 
+            align-items: center !important; 
+            justify-content: center !important; 
+            padding: 0 !important; 
+            line-height: 1 !important;
+            text-decoration: none !important;
+            outline: none !important;
         }
+        .leaflet-control-zoom a:hover { background: var(--bg-inner) !important; color: var(--green) !important; }
+        
+        .leaflet-control-attribution { background: rgba(9,9,11,0.8) !important; color: var(--txt-3) !important; font-size: 9px !important; }
+        .leaflet-control-attribution a { color: var(--txt-3) !important; }
 
-        /* ── LAYOUT ─────────────────────────────────────────────── */
-        .shell {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 1.5rem 1.5rem;
-        }
+        /* CUSTOM HUB MARKER */
+        .custom-hub-icon { background: transparent !important; border: none !important; outline: none !important; }
+        .hub-marker { width: 36px; height: 36px; position: relative; cursor: pointer; outline: none !important; }
+        .hub-marker-ring { width: 36px; height: 36px; border-radius: 50%; border: 2px solid;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .hub-marker-ring.active  { border-color: var(--green); background: rgba(74,222,128,0.12); }
+        .hub-marker-ring.planned { border-color: var(--txt-3); background: rgba(35,48,64,0.5); }
+        .hub-marker-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .hub-marker-dot.active  { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
+        .hub-marker-dot.planned { background: var(--txt-3); }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
 
-        /* ── HEADER ─────────────────────────────────────────────── */
-        .site-header {
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-        }
+        /* POPUP STYLES */
+        .hub-popup { min-width: 180px; }
+        .hub-popup-id   { font-size: 0.65rem; letter-spacing: 0.1em; color: var(--txt-2); margin-bottom: 0.25rem; }
+        .hub-popup-name { font-size: 0.88rem; font-weight: 600; color: var(--txt); margin-bottom: 0.2rem; }
+        .hub-popup-club { font-size: 0.72rem; color: var(--cyan); margin-bottom: 0.5rem; }
+        .hub-popup-meta { font-size: 0.72rem; color: var(--txt-2); display: flex; flex-direction: column; gap: 0.15rem; }
+        .hub-popup-status-active  { color: var(--green); }
+        .hub-popup-status-planned { color: var(--txt-3); }
+        .hub-popup-devices { font-size: 0.72rem; color: var(--txt-2); margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid var(--border); }
+        .hub-popup-link { display: inline-block; margin-top: 0.5rem; font-size: 0.7rem;
+            color: var(--green); border: 1px solid rgba(74,222,128,0.3); padding: 0.15rem 0.45rem; }
+        .hub-popup-link:hover { background: rgba(74,222,128,0.1); }
 
-        .header-top {
-            display: flex;
-            align-items: baseline;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
+        /* NODE LIST SIDEBAR */
+        .node-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); }
+        .node-item { padding: 0.85rem; border-bottom: 1px solid var(--border-d);
+            cursor: pointer; transition: background 0.12s; }
+        .node-item:last-child { border-bottom: none; }
+        .node-item:hover { background: var(--bg-panel); }
+        .node-item.active-node { background: var(--bg-panel); border-left: 2px solid var(--green); }
+        .node-item.planned-node { opacity: 0.55; }
+        .node-item-top { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
+        .node-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .node-dot.active  { background: var(--green); box-shadow: 0 0 5px var(--green); animation: pulse 2s infinite; }
+        .node-dot.planned { background: var(--txt-3); }
+        .node-name { font-size: 0.8rem; font-weight: 500; color: var(--txt); }
+        .node-club { font-size: 0.72rem; color: var(--cyan); }
+        .node-meta { font-size: 0.7rem; color: var(--txt-2); display: flex; gap: 0.75rem; }
+        .node-status-badge { font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase;
+            padding: 0.08rem 0.3rem; margin-left: auto; }
+        .nb-active  { color: var(--green);  border: 1px solid rgba(74,222,128,0.3); }
+        .nb-planned { color: var(--txt-3); border: 1px solid var(--border); }
 
-        .site-logo {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--green);
-            letter-spacing: 0.05em;
-            text-decoration: none;
-        }
+        /* ── ABOUT SECTION ───────────────────────────────────── */
+        .about-section { margin: 3rem 0; }
+        .about-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+            background: var(--border); border: 1px solid var(--border); }
+        @media (max-width: 700px) { .about-grid { grid-template-columns: 1fr; } }
+        .about-card { background: var(--bg-panel); padding: 1.25rem; }
+        .about-card-icon { font-size: 1.4rem; margin-bottom: 0.6rem; }
+        .about-card-title { font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--txt); margin-bottom: 0.5rem; font-weight: 600; }
+        .about-card-body { font-size: 0.78rem; color: var(--txt-2); line-height: 1.7; }
 
-        .site-logo::before { content: '❯ '; color: var(--txt-muted); }
+        /* ── RECENT DEVICES ──────────────────────────────────── */
+        .recent-section { margin: 3rem 0; }
+        .recent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px;
+            background: var(--border); border: 1px solid var(--border); }
+        .device-card { background: var(--bg-panel); padding: 1rem 1.1rem; transition: background 0.12s; }
+        .device-card:hover { background: var(--bg-inner); }
+        .device-card a { display: block; color: inherit; }
+        .dc-id   { font-size: 0.68rem; letter-spacing: 0.08em; color: var(--txt-2); margin-bottom: 0.25rem; }
+        .dc-name { font-size: 0.9rem; font-weight: 600; color: var(--txt); margin-bottom: 0.4rem; font-family: 'Syne', sans-serif; }
+        .dc-meta { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.72rem; color: var(--txt-2); }
+        .dc-hub  { font-size: 0.68rem; color: var(--cyan); display: flex; align-items: center; gap: 0.2rem; }
+        .dc-hub::before { content: '◈'; font-size: 0.55rem; }
+        .badge-sm { font-size: 0.65rem; padding: 0.08rem 0.3rem; border: 1px solid; letter-spacing: 0.05em; text-transform: uppercase; }
+        .bs-active      { color: var(--green); border-color: rgba(74,222,128,0.3); }
+        .bs-unallocated { color: var(--yellow); border-color: rgba(250,204,21,0.3); }
+        .bs-triage      { color: var(--red); border-color: rgba(248,113,113,0.3); }
+        .bs-default     { color: var(--txt-2); border-color: var(--border); }
+        .see-all-row { margin-top: 1rem; text-align: center; }
+        .see-all-link { font-size: 0.78rem; color: var(--txt-2); border: 1px solid var(--border);
+            padding: 0.5rem 1.25rem; display: inline-block; transition: all 0.15s; }
+        .see-all-link:hover { border-color: var(--green); color: var(--green); }
 
-        .site-tagline {
-            font-size: 0.78rem;
-            color: var(--txt-secondary);
-            letter-spacing: 0.02em;
-        }
-
-        /* ── STATS BAR ──────────────────────────────────────────── */
-        .stats-bar {
-            display: flex;
-            gap: 2rem;
-            margin-top: 0.75rem;
-            font-size: 0.78rem;
-            color: var(--txt-secondary);
-            flex-wrap: wrap;
-        }
-
-        .stat-item { display: flex; gap: 0.4rem; align-items: center; }
-        .stat-val  { color: var(--txt-primary); font-weight: 500; }
-        .stat-dot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-        .dot-green  { background: var(--green);  box-shadow: 0 0 6px var(--green); }
-        .dot-yellow { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
-        .dot-dim    { background: var(--txt-muted); }
-
-        /* ── TOOLBAR ────────────────────────────────────────────── */
-        .toolbar {
-            display: flex;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .search-wrap {
-            position: relative;
-            flex: 1;
-            min-width: 200px;
-            max-width: 480px;
-        }
-
-        .search-prefix {
-            position: absolute;
-            left: 0.75rem; top: 50%;
-            transform: translateY(-50%);
-            color: var(--green);
-            font-size: 0.85rem;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        #inventory-search {
-            width: 100%;
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 0;
-            color: var(--txt-primary);
-            font-family: var(--pico-font-family);
-            font-size: 0.85rem;
-            padding: 0.45rem 0.75rem 0.45rem 5.2rem;
-            outline: none;
-            transition: border-color 0.15s;
-        }
-
-        #inventory-search:focus { border-color: var(--green); }
-        #inventory-search::placeholder { color: var(--txt-muted); }
-
-        .filter-wrap {
-            display: flex;
-            gap: 0.4rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            color: var(--txt-secondary);
-            font-family: var(--pico-font-family);
-            font-size: 0.75rem;
-            padding: 0.35rem 0.65rem;
-            cursor: pointer;
-            border-radius: 0;
-            letter-spacing: 0.03em;
-            transition: all 0.12s;
-        }
-
-        .filter-btn:hover         { border-color: var(--txt-secondary); color: var(--txt-primary); }
-        .filter-btn.active        { border-color: var(--green); color: var(--green); }
-        .filter-btn[data-filter="Active"].active { border-color: var(--green); color: var(--green); }
-        .filter-btn[data-filter="unallocated"].active         { border-color: var(--yellow); color: var(--yellow); }
-        .filter-btn[data-filter="Awaiting Triage"].active     { border-color: var(--red); color: var(--red); }
-
-        .result-count {
-            margin-left: auto;
-            font-size: 0.75rem;
-            color: var(--txt-muted);
-            white-space: nowrap;
-            align-self: center;
-        }
-
-        /* ── TABLE ──────────────────────────────────────────────── */
-        .inventory-wrap {
-            border: 1px solid var(--border);
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-        }
-
-        thead tr {
-            background: var(--bg-panel);
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            padding: 0.5rem 0.75rem;
-            text-align: left;
-            font-weight: 500;
-            font-size: 0.72rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--txt-muted);
-            white-space: nowrap;
-            border-right: 1px solid var(--border-dim);
-        }
-
-        th:last-child { border-right: none; }
-
-        th .sort-indicator {
-            display: inline-block;
-            margin-left: 0.3rem;
-            opacity: 0.3;
-            font-size: 0.65rem;
-        }
-
-        th.sorted-asc  .sort-indicator,
-        th.sorted-desc .sort-indicator { opacity: 1; color: var(--green); }
-
-        th[data-sort] { cursor: pointer; user-select: none; }
-        th[data-sort]:hover { color: var(--txt-secondary); }
-
-        tbody tr {
-            background: var(--bg-row);
-            border-bottom: 1px solid var(--border-dim);
-            transition: background 0.1s;
-        }
-
-        tbody tr:hover      { background: var(--bg-hover); }
-        tbody tr.row-hidden { display: none; }
-
-        td {
-            padding: 0.5rem 0.75rem;
-            border-right: 1px solid var(--border-dim);
-            vertical-align: middle;
-            white-space: nowrap;
-        }
-
-        td:last-child { border-right: none; }
-
-        td.td-id code {
-            font-size: 0.78rem;
-            color: var(--txt-code);
-            letter-spacing: 0.03em;
-        }
-
-        td.td-device a {
-            color: var(--txt-primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        td.td-device a:hover { color: var(--green); }
-
-        td.td-arch {
-            color: var(--txt-secondary);
-            font-size: 0.78rem;
-        }
-
-        td.td-class {
-            color: var(--txt-secondary);
-            font-size: 0.78rem;
-            max-width: 180px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        td.td-donor, td.td-operator {
-            color: var(--txt-secondary);
-            font-size: 0.78rem;
-        }
-
-        td.td-donor a, td.td-operator a {
-            color: var(--txt-secondary);
-            text-decoration: none;
-        }
-
-        td.td-donor a:hover, td.td-operator a:hover { color: var(--blue); }
-
-        td.td-date {
-            color: var(--txt-muted);
-            font-size: 0.75rem;
-        }
-
-        /* ── STATUS BADGES ──────────────────────────────────────── */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            font-size: 0.7rem;
-            font-weight: 500;
-            letter-spacing: 0.04em;
-            padding: 0.15rem 0.45rem;
-            border-radius: 2px;
-            text-transform: uppercase;
-            border: 1px solid transparent;
-            white-space: nowrap;
-        }
-
-        .badge::before {
-            content: '';
-            width: 5px; height: 5px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .badge-active {
-            color: var(--green);
-            background: rgba(74, 222, 128, 0.08);
-            border-color: rgba(74, 222, 128, 0.2);
-        }
-        .badge-active::before { background: var(--green); box-shadow: 0 0 5px var(--green); animation: pulse 2s infinite; }
-
-        .badge-unallocated {
-            color: var(--yellow);
-            background: rgba(250, 204, 21, 0.08);
-            border-color: rgba(250, 204, 21, 0.2);
-        }
-        .badge-unallocated::before { background: var(--yellow); }
-
-        .badge-triage {
-            color: var(--red);
-            background: rgba(248, 113, 113, 0.08);
-            border-color: rgba(248, 113, 113, 0.2);
-        }
-        .badge-triage::before { background: var(--red); }
-
-        .badge-default {
-            color: var(--txt-secondary);
-            background: rgba(100, 116, 139, 0.08);
-            border-color: rgba(100, 116, 139, 0.2);
-        }
-        .badge-default::before { background: var(--txt-secondary); }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50%       { opacity: 0.4; }
-        }
-
-        /* ── EMPTY STATE ────────────────────────────────────────── */
-        .empty-state {
-            text-align: center;
-            padding: 2.5rem;
-            color: var(--txt-muted);
-            font-size: 0.82rem;
-            display: none;
-        }
-
-        .empty-state code { color: var(--txt-secondary); }
-
-        /* ── FOOTER ─────────────────────────────────────────────── */
-        .site-footer {
-            margin-top: 1.5rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid var(--border-dim);
-            font-size: 0.72rem;
-            color: var(--txt-muted);
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        /* ── PICO OVERRIDE CLEANUP ──────────────────────────────── */
-        a         { color: inherit; }
-        input     { margin-bottom: 0; }
-        button    { margin-bottom: 0; }
-        h1,h2,h3  { margin: 0; }
+        /* ── FOOTER ──────────────────────────────────────────── */
+        .site-footer { margin-top: 3rem; padding: 1.5rem 0 1rem; border-top: 1px solid var(--border-d);
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.72rem; color: var(--txt-3); flex-wrap: wrap; gap: 0.75rem; }
+        .footer-logo { font-family: 'Syne', sans-serif; font-size: 0.9rem; color: var(--txt-2); font-weight: 700; }
+        .footer-links { display: flex; gap: 1rem; }
+        .footer-links a { color: var(--txt-3); }
+        .footer-links a:hover { color: var(--green); }
     </style>
 </head>
 <body>
+
+<header class="top-bar">
+    <div class="logo">WHY NOT <span class="slash">/</span> HARDWARE</div>
+    <nav class="top-links">
+        <a href="/WNH-INVENTORY/">Home</a>
+        <a href="/WNH-INVENTORY/hardware/">Inventory</a>
+        <a href="#hubs">Hubs</a>
+        <a href="#about">About</a>
+    </nav>
+    <div class="top-right">
+        <a href="/WNH-INVENTORY/hardware/" class="inventory-btn">Open Inventory</a>
+    </div>
+</header>
+
 <div class="shell">
 
-    <header class="site-header">
-        <div class="header-top">
-            <a href="/" class="site-logo">WHY NOT HARDWARE</a>
-            <span class="site-tagline">// rescued e-waste · low-level systems · kernel lab</span>
-        </div>
-        <div class="stats-bar">
-            {{- $all   := where .Site.RegularPages "Section" "hardware" -}}
-            {{- $active := where $all ".Params.status" "Active" -}}
-            {{- $unalloc := where $all ".Params.status" "unallocated" -}}
-            {{- $triage  := where $all ".Params.status" "Awaiting Triage" -}}
-            <div class="stat-item">
-                <span class="stat-dot dot-dim"></span>
-                TOTAL <span class="stat-val">{{ len $all }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-dot dot-green"></span>
-                ACTIVE <span class="stat-val">{{ len $active }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-dot dot-yellow"></span>
-                UNALLOCATED <span class="stat-val">{{ len $unalloc }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-dot" style="background:var(--red)"></span>
-                TRIAGE <span class="stat-val">{{ len $triage }}</span>
-            </div>
-            <div class="stat-item" style="margin-left:auto">
-                <span style="color:var(--txt-muted)">GENERATED</span>
-                <span class="stat-val">{{ now.Format "2006-01-02 15:04" }} UTC</span>
+    {{- $allHW    := where .Site.RegularPages "Section" "hardware" -}}
+    {{- $active   := where $allHW ".Params.status" "Active" -}}
+    {{- $unalloc  := where $allHW ".Params.status" "unallocated" -}}
+    {{- $triage   := where $allHW ".Params.status" "Awaiting Triage" -}}
+    <section class="hero">
+        <div class="hero-left">
+            <div class="hero-label">e-waste rescue network · Morocco</div>
+            <h1 class="hero-title">
+                Don't trash it.<br>
+                <span class="accent">Hack it.</span>
+            </h1>
+            <p class="hero-desc">
+                Why Not Hardware is a distributed lab network intercepting discarded electronics
+                before they hit landfill — routers, smartphones, analog TVs — and repurposing
+                them for low-level systems engineering, kernel hacking, and embedded research.
+                Every device gets a second life and a place in the inventory.
+            </p>
+            <div class="hero-actions">
+                <a href="/WNH-INVENTORY/hardware/" class="btn-primary">Browse the Inventory</a>
+                <a href="#hubs" class="btn-ghost">Find a Hub</a>
             </div>
         </div>
-    </header>
+        <div class="hero-right">
+            <div class="stats-panel">
+                <div class="stats-panel-head">Network Status</div>
+                <div class="stat-grid">
+                    <div class="stat-cell">
+                        <div class="stat-num stat-num-cyan">{{ len $allHW }}</div>
+                        <div class="stat-lbl">Total Devices</div>
+                        <div class="stat-sub">cataloged in inventory</div>
+                    </div>
+                    <div class="stat-cell">
+                        <div class="stat-num stat-num-green">{{ len $active }}</div>
+                        <div class="stat-lbl">Active Nodes</div>
+                        <div class="stat-sub">compute-ready</div>
+                    </div>
+                    <div class="stat-cell">
+                        <div class="stat-num stat-num-yellow">{{ len $unalloc }}</div>
+                        <div class="stat-lbl">Unallocated</div>
+                        <div class="stat-sub">awaiting project</div>
+                    </div>
+                    <div class="stat-cell">
+                        <div class="stat-num" style="color:var(--txt-2);font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;line-height:1;margin-bottom:.3rem">1</div>
+                        <div class="stat-lbl">Active Hubs</div>
+                        <div class="stat-sub">benguerir node</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="toolbar">
-        <div class="search-wrap">
-            <span class="search-prefix">grep -i</span>
-            <input
-                type="search"
-                id="inventory-search"
-                placeholder="filter rows…"
-                autocomplete="off"
-                spellcheck="false"
-                aria-label="Search hardware inventory"
-            >
+    <section class="hub-section" id="hubs">
+        <div class="sec-head">
+            <span class="sec-label">Network Nodes</span>
+            <div class="sec-rule"></div>
         </div>
-        <div class="filter-wrap" aria-label="Filter by status">
-            <button class="filter-btn active" data-filter="ALL">ALL</button>
-            <button class="filter-btn" data-filter="Active">ACTIVE</button>
-            <button class="filter-btn" data-filter="unallocated">UNALLOC</button>
-            <button class="filter-btn" data-filter="Awaiting Triage">TRIAGE</button>
+        <div class="hub-layout">
+            <div id="hub-map" aria-label="Map of WNH hub locations"></div>
+            <div class="node-list" id="node-list" aria-label="Hub node list"></div>
         </div>
-        <span class="result-count" id="row-count" aria-live="polite"></span>
-    </div>
+    </section>
 
-    <div class="inventory-wrap">
-        <table id="inventory-table" aria-label="Hardware Inventory">
-            <thead>
-                <tr>
-                    <th data-sort="id">ASSET ID <span class="sort-indicator">↕</span></th>
-                    <th data-sort="device">DEVICE <span class="sort-indicator">↕</span></th>
-                    <th data-sort="class">CLASS <span class="sort-indicator">↕</span></th>
-                    <th data-sort="arch">ARCHITECTURE <span class="sort-indicator">↕</span></th>
-                    <th data-sort="status">STATUS <span class="sort-indicator">↕</span></th>
-                    <th data-sort="donor">DONOR <span class="sort-indicator">↕</span></th>
-                    <th data-sort="operator">OPERATOR <span class="sort-indicator">↕</span></th>
-                    <th data-sort="date">LOGGED <span class="sort-indicator">↕</span></th>
-                </tr>
-            </thead>
-            <tbody id="inventory-body">
-                {{- $pages := where .Site.RegularPages "Section" "hardware" -}}
-                {{- range $pages.ByParam "asset_id" -}}
-                {{- $statusClass := "badge-default" -}}
-                {{- if eq .Params.status "Active" -}}{{ $statusClass = "badge-active" }}{{- end -}}
-                {{- if eq .Params.status "unallocated" -}}{{ $statusClass = "badge-unallocated" }}{{- end -}}
-                {{- if eq .Params.status "Awaiting Triage" -}}{{ $statusClass = "badge-triage" }}{{- end -}}
-                <tr
-                    data-id="{{ .Params.asset_id | lower }}"
-                    data-device="{{ .Title | lower }}"
-                    data-class="{{ .Params.class | lower }}"
-                    data-arch="{{ .Params.architecture | lower }}"
-                    data-status="{{ .Params.status | lower }}"
-                    data-donor="{{ .Params.donor | lower }}"
-                    data-operator="{{ .Params.operator | default "—" | lower }}"
-                    data-date="{{ .Date.Format "2006-01-02" }}"
-                >
-                    <td class="td-id"><code>{{ .Params.asset_id }}</code></td>
-                    <td class="td-device"><a href="{{ .Permalink }}">{{ .Title }}</a></td>
-                    <td class="td-class">{{ .Params.class }}</td>
-                    <td class="td-arch">{{ .Params.architecture }}</td>
-                    <td class="td-status">
-                        <span class="badge {{ $statusClass }}">{{ .Params.status }}</span>
-                    </td>
-                    <td class="td-donor">
-                        {{- if .Params.donor_link -}}
-                        <a href="{{ .Params.donor_link }}" target="_blank" rel="noopener">{{ .Params.donor }}</a>
-                        {{- else -}}
-                        {{ .Params.donor }}
-                        {{- end -}}
-                    </td>
-                    <td class="td-operator">
-                        {{- if .Params.operator_link -}}
-                        <a href="{{ .Params.operator_link }}" target="_blank" rel="noopener">{{ .Params.operator }}</a>
-                        {{- else -}}
-                        {{ .Params.operator | default "—" }}
-                        {{- end -}}
-                    </td>
-                    <td class="td-date">{{ .Date.Format "2006-01-02" }}</td>
-                </tr>
-                {{- end }}
-            </tbody>
-        </table>
-        <div class="empty-state" id="empty-state">
-            <div>no results for <code id="empty-query"></code></div>
-            <div style="margin-top:0.35rem;font-size:0.72rem">try a different search term or clear the filter</div>
+    <section class="about-section" id="about">
+        <div class="sec-head">
+            <span class="sec-label">What Is WNH</span>
+            <div class="sec-rule"></div>
         </div>
-    </div>
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="about-card-icon">📡</div>
+                <div class="about-card-title">Intercept</div>
+                <div class="about-card-body">
+                    Donated or recovered e-waste is received at a hub node, cataloged
+                    with a unique WNH asset ID, and logged into this inventory. Nothing
+                    goes undocumented.
+                </div>
+            </div>
+            <div class="about-card">
+                <div class="about-card-icon">🔧</div>
+                <div class="about-card-title">Rescue</div>
+                <div class="about-card-body">
+                    Hardware is assessed, triaged, and assigned to an engineer or
+                    project. Broken screens, dead batteries, bricked firmware —
+                    everything gets a shot at revival.
+                </div>
+            </div>
+            <div class="about-card">
+                <div class="about-card-icon">⚙️</div>
+                <div class="about-card-title">Deploy</div>
+                <div class="about-card-body">
+                    Rescued devices become compute nodes, testbeds for kernel
+                    experiments, embedded systems labs, or platform for low-level
+                    driver and OS research.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{- if $allHW }}
+    <section class="recent-section">
+        <div class="sec-head">
+            <span class="sec-label">Recently Cataloged</span>
+            <div class="sec-rule"></div>
+        </div>
+        <div class="recent-grid">
+            {{- range first 6 ($allHW.ByDate.Reverse) -}}
+            {{- $bsc := "bs-default" -}}
+            {{- if eq .Params.status "Active Compute Node" -}}{{- $bsc = "bs-active" -}}{{- end -}}
+            {{- if eq .Params.status "unallocated" -}}{{- $bsc = "bs-unallocated" -}}{{- end -}}
+            {{- if eq .Params.status "Awaiting Triage" -}}{{- $bsc = "bs-triage" -}}{{- end -}}
+            <div class="device-card">
+                <a href="{{ .Permalink }}">
+                    <div class="dc-id">{{ .Params.asset_id }} &nbsp;·&nbsp; {{ .Date.Format "2006-01-02" }}</div>
+                    <div class="dc-name">{{ .Title }}</div>
+                    <div class="dc-meta">
+                        <span class="badge-sm {{ $bsc }}">{{ .Params.status }}</span>
+                        {{- if .Params.hub }}<span class="dc-hub">{{ .Params.hub }}</span>{{- end }}
+                    </div>
+                </a>
+            </div>
+            {{- end }}
+        </div>
+        <div class="see-all-row">
+            <a href="/WNH-INVENTORY/hardware/" class="see-all-link">View all {{ len $allHW }} devices in the inventory →</a>
+        </div>
+    </section>
+    {{- end }}
 
     <footer class="site-footer">
-        <span>WHY NOT HARDWARE // e-waste rescue inventory</span>
-        <span>{{ len (where .Site.RegularPages "Section" "hardware") }} device(s) cataloged</span>
+        <div class="footer-logo">WHY NOT HARDWARE</div>
+        <div class="footer-links">
+            <a href="/WNH-INVENTORY/hardware/">Inventory</a>
+            <a href="#hubs">Hubs</a>
+            <a href="#about">About</a>
+        </div>
+        <span>e-waste rescue · Morocco · {{ now.Format "2006" }}</span>
     </footer>
 
-</div>
-
+</div><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function () {
     'use strict';
 
-    const searchInput  = document.getElementById('inventory-search');
-    const filterBtns   = document.querySelectorAll('.filter-btn');
-    const rows         = Array.from(document.querySelectorAll('#inventory-body tr'));
-    const rowCount     = document.getElementById('row-count');
-    const emptyState   = document.getElementById('empty-state');
-    const emptyQuery   = document.getElementById('empty-query');
-    const headers      = document.querySelectorAll('th[data-sort]');
+    /* ── HUB DATA ───────────────────────────────────────────────────────────
+       Add future nodes here as they come online.
+       status: "active" | "planned"
+    ──────────────────────────────────────────────────────────────────────── */
+    const HUBS = [
+        {
+            id:       "BEN-001",
+            name:     "1337 Benguerir",
+            club:     "LEETMAKERS",
+            city:     "Benguerir",
+            region:   "Marrakech-Safi",
+            lat:      32.2378,
+            lng:      -7.9531,
+            status:   "active",
+            url:      "https://www.instagram.com/leetmakers/",
+            note:     "Founding node. Houses the WNH rescue lab."
+        },
+        {
+            id:       "KHO-001",
+            name:     "1337 Khouribga",
+            club:     "",
+            city:     "Khouribga",
+            region:   "Béni Mellal-Khénifra",
+            lat:      32.8839,
+            lng:      -6.9063,
+            status:   "planned",
+            url:      "",
+            note:     "Planned expansion node."
+        },
+        {
+            id:       "RAB-001",
+            name:     "Rabat Hub",
+            club:     "",
+            city:     "Rabat",
+            region:   "Rabat-Salé-Kénitra",
+            lat:      34.0209,
+            lng:      -6.8416,
+            status:   "planned",
+            url:      "",
+            note:     "Planned expansion node."
+        },
+        {
+            id:       "TET-001",
+            name:     "Tétouan Hub",
+            club:     "",
+            city:     "Tétouan",
+            region:   "Tanger-Tétouan-Al Hoceïma",
+            lat:      35.5785,
+            lng:      -5.3684,
+            status:   "planned",
+            url:      "",
+            note:     "Planned expansion node."
+        }
+    ];
 
-    let activeFilter  = 'ALL';
-    let sortKey       = null;
-    let sortDir       = 'asc';
+    /* ── MAP INIT ───────────────────────────────────────────── */
+    const map = L.map('hub-map', {
+        center: [32.8, -6.0],
+        zoom: 6,
+        zoomControl: true,
+        attributionControl: true,
+        scrollWheelZoom: false
+    });
 
-    /* ── FILTER ENGINE ──────────────────────────────────────── */
-    function applyFilters() {
-        const query = searchInput.value.trim().toLowerCase();
-        let visible = 0;
+    /* Dark tile layer — Carto Dark Matter, no API key needed */
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
 
-        rows.forEach(row => {
-            const searchFields = [
-                row.dataset.id,
-                row.dataset.device,
-                row.dataset.arch,
-                row.dataset.class,
-                row.dataset.donor,
-                row.dataset.operator
-            ].join(' ');
-
-            const matchesSearch = !query || searchFields.includes(query);
-            const matchesFilter = activeFilter === 'ALL' ||
-                row.dataset.status === activeFilter.toLowerCase();
-
-            const show = matchesSearch && matchesFilter;
-            row.classList.toggle('row-hidden', !show);
-            if (show) visible++;
-        });
-
-        const total = rows.length;
-        rowCount.textContent = `${visible}/${total} device(s)`;
-
-        const isEmpty = visible === 0;
-        emptyState.style.display = isEmpty ? 'block' : 'none';
-        if (isEmpty) emptyQuery.textContent = query || activeFilter;
+    /* ── CUSTOM MARKER ICON ─────────────────────────────────── */
+    function makeIcon(status) {
+        const isActive = status === 'active';
+        const html = `
+            <div class="hub-marker">
+                <div class="hub-marker-ring ${status}">
+                    <div class="hub-marker-dot ${status}"></div>
+                </div>
+            </div>`;
+        return L.divIcon({ html, className: 'custom-hub-icon', iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -20] });
     }
 
-    /* ── SORT ENGINE ────────────────────────────────────────── */
-    function sortTable(key) {
-        if (sortKey === key) {
-            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-        } else {
-            sortKey = key;
-            sortDir = 'asc';
-        }
-
-        headers.forEach(h => {
-            const ind = h.querySelector('.sort-indicator');
-            h.classList.remove('sorted-asc', 'sorted-desc');
-            ind.textContent = '↕';
-            if (h.dataset.sort === sortKey) {
-                h.classList.add(sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
-                ind.textContent = sortDir === 'asc' ? '↑' : '↓';
-            }
-        });
-
-        const tbody = document.getElementById('inventory-body');
-        const sorted = [...rows].sort((a, b) => {
-            const av = a.dataset[key] || '';
-            const bv = b.dataset[key] || '';
-            return sortDir === 'asc'
-                ? av.localeCompare(bv, undefined, { numeric: true })
-                : bv.localeCompare(av, undefined, { numeric: true });
-        });
-        sorted.forEach(r => tbody.appendChild(r));
-        applyFilters();
+    /* ── POPUP TEMPLATE ─────────────────────────────────────── */
+    function makePopup(hub) {
+        const statusLabel = hub.status === 'active' ? 'ONLINE' : 'PLANNED';
+        const statusClass = hub.status === 'active' ? 'hub-popup-status-active' : 'hub-popup-status-planned';
+        const linkHtml    = hub.url
+            ? `<a href="${hub.url}" target="_blank" rel="noopener" class="hub-popup-link">Visit Hub →</a>`
+            : '';
+        const clubHtml    = hub.club ? `<div class="hub-popup-club">◈ ${hub.club}</div>` : '';
+        return `
+            <div class="hub-popup">
+                <div class="hub-popup-id">${hub.id} &nbsp;·&nbsp; <span class="${statusClass}">${statusLabel}</span></div>
+                <div class="hub-popup-name">${hub.name}</div>
+                ${clubHtml}
+                <div class="hub-popup-meta">
+                    <span>${hub.city}, ${hub.region}</span>
+                    <span style="color:var(--txt-3)">${hub.note}</span>
+                </div>
+                ${linkHtml}
+            </div>`;
     }
 
-    /* ── EVENT BINDINGS ─────────────────────────────────────── */
-    searchInput.addEventListener('input', applyFilters);
+    /* ── NODE LIST SIDEBAR ──────────────────────────────────── */
+    const nodeListEl = document.getElementById('node-list');
+    const markers    = [];
 
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            activeFilter = btn.dataset.filter;
-            applyFilters();
+    HUBS.forEach((hub, i) => {
+        /* Map marker */
+        const marker = L.marker([hub.lat, hub.lng], { icon: makeIcon(hub.status) })
+            .addTo(map)
+            .bindPopup(makePopup(hub), { maxWidth: 240, minWidth: 200 });
+        markers.push(marker);
+
+        /* Sidebar node item */
+        const nodeEl = document.createElement('div');
+        const isActiveHub = hub.status === 'active';
+        nodeEl.className = 'node-item' + (isActiveHub ? ' active-node' : ' planned-node');
+        nodeEl.innerHTML = `
+            <div class="node-item-top">
+                <span class="node-dot ${hub.status}"></span>
+                <span class="node-name">${hub.name}</span>
+                <span class="node-status-badge ${isActiveHub ? 'nb-active' : 'nb-planned'}">${isActiveHub ? 'ONLINE' : 'PLANNED'}</span>
+            </div>
+            ${hub.club ? `<div class="node-club">◈ ${hub.club}</div>` : ''}
+            <div class="node-meta">
+                <span>${hub.city}</span>
+                <span>${hub.id}</span>
+            </div>`;
+        nodeEl.addEventListener('click', () => {
+            map.flyTo([hub.lat, hub.lng], 11, { duration: 1.2 });
+            marker.openPopup();
         });
+        nodeListEl.appendChild(nodeEl);
     });
 
-    headers.forEach(h => {
-        h.addEventListener('click', () => sortTable(h.dataset.sort));
-    });
+    /* Fit map bounds to all markers on load */
+    const group = L.featureGroup(markers);
+    map.fitBounds(group.getBounds().pad(0.3));
 
-    /* ── KEYBOARD SHORTCUT: / to focus search ───────────────── */
-    document.addEventListener('keydown', e => {
-        if (e.key === '/' && document.activeElement !== searchInput) {
-            e.preventDefault();
-            searchInput.focus();
-        }
-        if (e.key === 'Escape') {
-            searchInput.value = '';
-            applyFilters();
-            searchInput.blur();
-        }
-    });
+    /* Disable scroll-zoom, enable on click */
+    map.on('click', () => map.scrollWheelZoom.enable());
+    map.on('mouseout', () => map.scrollWheelZoom.disable());
 
-    /* ── INIT ───────────────────────────────────────────────── */
-    applyFilters();
 })();
 </script>
 </body>
