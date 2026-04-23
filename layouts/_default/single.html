@@ -275,10 +275,10 @@
                     <span class="pill-key">arch:</span>
                     <span class="pill-val">{{ .Params.architecture }}</span>
                 </span>
-                {{- if .Params.ram }}
+                {{- if .Params.memory }}
                 <span class="pill">
-                    <span class="pill-key">ram:</span>
-                    <span class="pill-val">{{ .Params.ram }}</span>
+                    <span class="pill-key">memory:</span>
+                    <span class="pill-val">{{ .Params.memory }}</span>
                 </span>
                 {{- end }}
                 {{- if .Params.hub }}
@@ -402,10 +402,10 @@
                         <div class="spec-k">Architecture</div>
                         <div class="spec-v">{{ .Params.architecture }}</div>
                     </div>
-                    {{- if .Params.ram }}
+                    {{- if .Params.memory }}
                     <div class="spec-row">
                         <div class="spec-k">RAM</div>
-                        <div class="spec-v">{{ .Params.ram }}</div>
+                        <div class="spec-v">{{ .Params.memory }}</div>
                     </div>
                     {{- end }}
                     <div class="spec-row">
