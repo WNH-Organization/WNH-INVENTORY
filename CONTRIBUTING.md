@@ -36,7 +36,7 @@ If you are taking an `unallocated` device from the lab to work on it, you must u
 
 1. Find the device's `index.md` file in `content/hardware/`.
 2. Update the YAML Front Matter:
-   * Change `status` to `Active Compute Node`.
+   * Change `status` to `Active`.
    * Add your name to `operator`.
    * Add a link to your GitHub/LinkedIn in `operator_link`.
 3. Append a new update to the `updates` array to log what you are doing:
